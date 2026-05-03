@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oglas — Nomads Croatia</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script>
+<link rel="preload" href="/fonts/jost-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/cormorant-normal-latin.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:'Jost';font-style:normal;font-weight:200 600;font-display:swap;src:url('/fonts/jost-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;}
+@font-face{font-family:'Jost';font-style:normal;font-weight:200 600;font-display:swap;src:url('/fonts/jost-latin.woff2') format('woff2');}
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:300 500;font-display:swap;src:url('/fonts/cormorant-normal-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;}
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:300 500;font-display:swap;src:url('/fonts/cormorant-normal-latin.woff2') format('woff2');}
+@font-face{font-family:'Cormorant Garamond';font-style:italic;font-weight:300 400;font-display:swap;src:url('/fonts/cormorant-italic-latin.woff2') format('woff2');}
+</style>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --navy:#1C3026;--teal:#2A6049;--teal-mid:#357A5C;--teal-pale:#DFF0E8;
+  --accent:#F59E0B;--accent-pale:#FEF3C7;
+  --white:#fff;--off:#F8FBF9;--cream:#F3F7F4;--border:#D8E8DD;
+  --text:#0D1E28;--text-light:#3E5F4C;--text-muted:#6D9B7E;
+  --green:#16A34A;--green-pale:#DCFCE7;--red:#EF4444;--red-pale:#FEF2F2;
+  --shadow:0 2px 12px rgba(28,48,38,0.07);--shadow-md:0 6px 28px rgba(28,48,38,0.11);--shadow-lg:0 16px 56px rgba(28,48,38,0.15);
+}
+html{scroll-behavior:smooth;}
+body{font-family:'Jost',sans-serif;background:#fff;color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+img{max-width:100%;height:auto;display:block;}a{text-decoration:none;color:inherit;}button{cursor:pointer;font-family:'Jost',sans-serif;}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:200;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;background:#fff;border-bottom:1px solid var(--border);box-shadow:var(--shadow);}
+.nav-logo{display:flex;align-items:center;gap:9px;text-decoration:none;}
+.nav-logo-icon{width:32px;height:32px;background:var(--navy);border-radius:8px;display:flex;align-items:center;justify-content:center;}
+.nav-logo-icon svg{width:17px;height:17px;fill:#fff;}
+.nav-logo-text{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:var(--navy);}
+.nav-back{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-light);transition:color 0.2s;}
+.nav-back:hover{color:var(--navy);}
+.nav-back svg{width:16px;height:16px;fill:currentColor;}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.nav-share{padding:7px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:11px;font-weight:600;color:var(--text);background:#fff;transition:all 0.2s;}
+.nav-share:hover{border-color:var(--teal);color:var(--teal);}
+.nav-save{padding:7px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:11px;font-weight:600;color:var(--text);background:#fff;transition:all 0.2s;display:flex;align-items:center;gap:5px;}
+.nav-save:hover{border-color:var(--red);color:var(--red);}
+.nav-save svg{width:14px;height:14px;fill:currentColor;}
+
+/* GALLERY */
+.gallery{position:relative;height:480px;overflow:hidden;}
+.gallery-main{width:100%;height:100%;object-fit:cover;cursor:zoom-in;}
+.gallery-grid{display:grid;grid-template-columns:1fr 320px;grid-template-rows:1fr 1fr;gap:4px;height:100%;}
+.gallery-grid .g0{grid-row:span 2;overflow:hidden;}
+.gallery-grid .g0 img{width:100%;height:100%;object-fit:cover;cursor:pointer;transition:transform 0.3s;}
+.gallery-grid .g0:hover img{transform:scale(1.03);}
+.gallery-thumb{overflow:hidden;position:relative;}
+.gallery-thumb img{width:100%;height:100%;object-fit:cover;cursor:pointer;transition:transform 0.3s;}
+.gallery-thumb:hover img{transform:scale(1.05);}
+.gallery-thumb.last::after{content:attr(data-more);position:absolute;inset:0;background:rgba(28,48,38,0.6);display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;font-weight:600;cursor:pointer;}
+.gallery-badge{position:absolute;bottom:16px;left:16px;z-index:10;display:flex;gap:8px;}
+.gbadge{padding:5px 12px;border-radius:8px;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;backdrop-filter:blur(8px);}
+.gbadge-type{background:rgba(28,48,38,0.85);color:#fff;}
+.gbadge-wifi.fast{background:rgba(22,163,74,0.9);color:#fff;}
+.gbadge-wifi.mid{background:rgba(245,158,11,0.9);color:#fff;}
+.gbadge-wifi.slow{background:rgba(239,68,68,0.9);color:#fff;}
+.gallery-all-btn{position:absolute;bottom:16px;right:16px;z-index:10;padding:8px 16px;background:rgba(255,255,255,0.92);border:none;border-radius:8px;font-size:11px;font-weight:600;color:var(--navy);display:flex;align-items:center;gap:6px;transition:all 0.2s;backdrop-filter:blur(4px);}
+.gallery-all-btn:hover{background:#fff;box-shadow:var(--shadow-md);}
+.gallery-all-btn svg{width:14px;height:14px;fill:var(--navy);}
+
+/* LIGHTBOX */
+.lightbox{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.95);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s;}
+.lightbox.open{opacity:1;pointer-events:all;}
+.lightbox-close{position:absolute;top:20px;right:24px;background:none;border:none;color:#fff;font-size:28px;cursor:pointer;z-index:10;}
+.lightbox-img{max-width:90vw;max-height:85vh;object-fit:contain;border-radius:4px;}
+.lightbox-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.12);border:none;color:#fff;width:48px;height:48px;border-radius:50%;font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background 0.2s;}
+.lightbox-nav:hover{background:rgba(255,255,255,0.25);}
+.lightbox-prev{left:20px;}
+.lightbox-next{right:20px;}
+.lightbox-counter{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,0.6);font-size:13px;}
+
+/* LAYOUT */
+.page-inner{max-width:1200px;margin:0 auto;padding:40px 32px 80px;display:grid;grid-template-columns:1fr 380px;gap:48px;align-items:start;}
+.main-col{}
+.side-col{position:sticky;top:80px;}
+
+/* BREADCRUMB */
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-muted);margin-bottom:20px;}
+.breadcrumb a{color:var(--text-muted);transition:color 0.2s;}
+.breadcrumb a:hover{color:var(--teal);}
+.breadcrumb svg{width:12px;height:12px;fill:var(--text-muted);}
+
+/* TITLE BLOCK */
+.title-block{margin-bottom:28px;}
+.title-block-loc{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text-muted);margin-bottom:8px;}
+.title-block-loc svg{width:13px;height:13px;fill:var(--text-muted);}
+.title-main{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,3.5vw,40px);font-weight:400;color:var(--navy);line-height:1.2;margin-bottom:14px;}
+.title-badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.tbadge{display:flex;align-items:center;gap:6px;padding:6px 13px;border-radius:8px;font-size:11px;font-weight:600;}
+.tbadge-wifi{background:var(--green-pale);color:var(--green);}
+.tbadge-wifi.mid{background:var(--accent-pale);color:#92400E;}
+.tbadge-wifi.slow{background:var(--red-pale);color:var(--red);}
+.tbadge-wifi svg,.tbadge svg{width:14px;height:14px;fill:currentColor;}
+.tbadge-type{background:var(--teal-pale);color:var(--teal);}
+.tbadge-min{background:var(--cream);color:var(--text-light);border:1px solid var(--border);}
+.title-meta{display:flex;gap:20px;flex-wrap:wrap;}
+.title-meta-item{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-light);}
+.title-meta-item svg{width:15px;height:15px;fill:var(--text-muted);}
+
+/* SECTION DIVIDER */
+.sec-div{height:1px;background:var(--border);margin:28px 0;}
+
+/* SECTION TITLE */
+.sec-label{font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-muted);margin-bottom:14px;}
+.sec-heading{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:400;color:var(--navy);margin-bottom:16px;}
+
+/* DESCRIPTION */
+.description{font-size:14px;color:var(--text-light);line-height:1.75;}
+.description.collapsed{max-height:120px;overflow:hidden;position:relative;}
+.description.collapsed::after{content:'';position:absolute;bottom:0;left:0;right:0;height:40px;background:linear-gradient(transparent,#fff);}
+.show-more-btn{margin-top:12px;font-size:13px;font-weight:600;color:var(--teal);background:none;border:none;padding:0;display:flex;align-items:center;gap:4px;}
+.show-more-btn svg{width:14px;height:14px;fill:var(--teal);transition:transform 0.2s;}
+.show-more-btn.open svg{transform:rotate(180deg);}
+
+/* AMENITIES */
+.amenities-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.amenity{display:flex;align-items:center;gap:10px;padding:11px 13px;border:1px solid var(--border);border-radius:10px;}
+.amenity-icon{font-size:18px;flex-shrink:0;width:28px;text-align:center;}
+.amenity-label{font-size:12px;color:var(--text-light);font-weight:500;}
+
+/* WIFI DETAIL */
+.wifi-detail{background:linear-gradient(135deg,var(--navy),#1E4030);border-radius:14px;padding:22px;color:#fff;margin-bottom:0;}
+.wifi-detail-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.wifi-detail-title{font-size:13px;font-weight:600;letter-spacing:0.05em;}
+.wifi-speed-big{font-family:'Cormorant Garamond',serif;font-size:44px;font-weight:400;color:#fff;line-height:1;}
+.wifi-unit{font-size:13px;color:rgba(255,255,255,0.5);margin-left:6px;}
+.wifi-bars{display:flex;gap:4px;align-items:flex-end;margin-bottom:14px;}
+.wifi-bar{border-radius:3px 3px 0 0;background:rgba(255,255,255,0.15);}
+.wifi-bar.active.fast{background:#22C55E;}
+.wifi-bar.active.mid{background:#F59E0B;}
+.wifi-bar.active.slow{background:#EF4444;}
+.wifi-detail-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.wifi-stat{background:rgba(255,255,255,0.07);border-radius:8px;padding:10px 12px;}
+.wifi-stat-lbl{font-size:10px;color:rgba(255,255,255,0.45);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;}
+.wifi-stat-val{font-size:16px;font-weight:600;color:#fff;}
+.wifi-stat-val small{font-size:11px;font-weight:400;color:rgba(255,255,255,0.5);}
+.wifi-provider{font-size:11px;color:rgba(255,255,255,0.4);margin-top:10px;}
+
+/* COLIVING ROOMS */
+.rooms-section{margin-top:0;}
+.rooms-tabs{display:flex;gap:8px;margin-bottom:24px;overflow-x:auto;padding-bottom:4px;}
+.room-tab{flex-shrink:0;padding:9px 18px;border:1.5px solid var(--border);border-radius:10px;font-size:12px;font-weight:600;background:#fff;color:var(--text-light);cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.room-tab:hover{border-color:var(--teal);color:var(--teal);}
+.room-tab.active{background:var(--teal);color:#fff;border-color:var(--teal);}
+.room-tab.avail{position:relative;}
+.room-tab.avail::after{content:'';position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:#22C55E;border:1.5px solid #fff;}
+.room-panel{display:none;}
+.room-panel.active{display:block;}
+
+/* ROOM GALLERY */
+.room-gallery{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:4px;margin-bottom:18px;-webkit-overflow-scrolling:touch;}
+.room-gallery::-webkit-scrollbar{height:3px;}
+.room-gallery::-webkit-scrollbar-track{background:var(--border);}
+.room-gallery::-webkit-scrollbar-thumb{background:var(--teal-pale2);border-radius:10px;}
+.rg-img{flex-shrink:0;width:280px;height:200px;border-radius:12px;overflow:hidden;scroll-snap-align:start;cursor:pointer;}
+.rg-img img{width:100%;height:100%;object-fit:cover;transition:transform 0.3s;}
+.rg-img:hover img{transform:scale(1.04);}
+
+/* ROOM INFO */
+.room-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;}
+.room-stat{background:var(--cream);border-radius:10px;padding:13px 16px;}
+.room-stat-lbl{font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);margin-bottom:5px;}
+.room-stat-val{font-size:17px;font-weight:600;color:var(--navy);}
+.room-stat-val small{font-size:11px;font-weight:400;color:var(--text-muted);}
+.room-desc{font-size:13px;color:var(--text-light);line-height:1.7;}
+.room-amenities{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px;}
+.ramtag{padding:5px 10px;background:var(--teal-pale);color:var(--teal);border-radius:6px;font-size:11px;font-weight:600;}
+
+/* CALENDAR */
+.cal-wrap{background:#fff;border:1.5px solid var(--border);border-radius:16px;overflow:hidden;}
+.cal-hdr{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.cal-nav-btns{display:flex;align-items:center;gap:10px;}
+.cal-nav-btn{width:32px;height:32px;border-radius:8px;border:1.5px solid var(--border);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--navy);transition:all 0.15s;}
+.cal-nav-btn:hover{border-color:var(--teal);color:var(--teal);}
+.cal-month-label{font-size:15px;font-weight:600;color:var(--navy);min-width:150px;text-align:center;}
+.cal-legend{display:flex;gap:14px;font-size:11px;color:var(--text-muted);}
+.cal-leg-dot{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:4px;}
+.cal-grid-wrap{padding:14px 16px;}
+.cal-days-head{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px;}
+.cal-day-lbl{text-align:center;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);padding:4px 0;}
+.cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.cal-day{aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.15s;border:1.5px solid transparent;color:var(--text);}
+.cal-day.empty{cursor:default;}
+.cal-day.past{opacity:0.3;cursor:not-allowed;}
+.cal-day.booked{background:#FEE2E2;color:#B91C1C;cursor:not-allowed;text-decoration:line-through;}
+.cal-day.available:hover{background:var(--teal-pale);border-color:var(--teal);}
+.cal-day.selected{background:var(--navy)!important;color:#fff!important;border-color:var(--navy)!important;}
+.cal-day.in-range{background:var(--teal-pale);border-color:transparent;}
+.cal-day.start-range{background:var(--navy);color:#fff;border-radius:8px 0 0 8px;}
+.cal-day.end-range{background:var(--navy);color:#fff;border-radius:0 8px 8px 0;}
+.cal-day.today{border-color:var(--accent);}
+
+/* BOOKING CARD */
+.booking-card{background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:22px;box-shadow:var(--shadow-md);}
+.booking-price-row{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:18px;}
+.booking-price-week{font-size:28px;font-weight:700;color:var(--navy);}
+.booking-price-per{font-size:13px;color:var(--text-muted);margin-left:5px;}
+.booking-price-month{font-size:14px;color:var(--text-light);}
+.booking-tabs{display:flex;gap:4px;margin-bottom:18px;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;}
+.booking-tab{flex:1;padding:9px;font-size:12px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;border:none;background:#fff;color:var(--text-muted);cursor:pointer;transition:all 0.15s;}
+.booking-tab.active{background:var(--navy);color:#fff;}
+.booking-field{margin-bottom:14px;}
+.booking-field label{display:block;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;}
+.booking-input{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:9px;font-family:'Jost',sans-serif;font-size:13px;color:var(--text);outline:none;transition:border 0.2s;}
+.booking-input:focus{border-color:var(--teal);}
+.booking-summary{background:var(--cream);border-radius:10px;padding:14px;margin-bottom:16px;}
+.booking-summary-row{display:flex;justify-content:space-between;font-size:13px;color:var(--text-light);margin-bottom:6px;}
+.booking-summary-row:last-child{margin-bottom:0;padding-top:8px;border-top:1px solid var(--border);font-weight:600;color:var(--navy);}
+.booking-btn{width:100%;padding:14px;background:var(--teal);border:none;border-radius:10px;color:#fff;font-size:12px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;transition:background 0.2s;margin-bottom:10px;}
+.booking-btn:hover{background:var(--navy);}
+.booking-note{font-size:11px;color:var(--text-muted);text-align:center;line-height:1.5;}
+.booking-host{display:flex;align-items:center;gap:13px;padding-top:18px;border-top:1px solid var(--border);margin-top:18px;}
+.booking-host-av{width:44px;height:44px;border-radius:50%;object-fit:cover;}
+.booking-host-name{font-size:14px;font-weight:600;color:var(--navy);}
+.booking-host-sub{font-size:11px;color:var(--text-muted);margin-top:1px;}
+.booking-host-badge{font-size:10px;font-weight:700;color:var(--green);background:var(--green-pale);padding:2px 8px;border-radius:10px;display:inline-block;margin-top:3px;}
+.booking-contact-btn{margin-left:auto;padding:8px 14px;background:var(--cream);border:1.5px solid var(--border);border-radius:8px;font-size:11px;font-weight:600;color:var(--text);cursor:pointer;transition:all 0.2s;}
+.booking-contact-btn:hover{border-color:var(--teal);color:var(--teal);}
+
+/* MAP SECTION */
+.map-section{border-radius:14px;overflow:hidden;height:280px;border:1px solid var(--border);}
+#detailMap{width:100%;height:100%;}
+
+/* HOST SECTION */
+.host-section{display:flex;gap:18px;align-items:flex-start;}
+.host-av-lg{width:70px;height:70px;border-radius:50%;object-fit:cover;flex-shrink:0;}
+.host-info{flex:1;}
+.host-name{font-size:18px;font-weight:600;color:var(--navy);margin-bottom:3px;}
+.host-meta{font-size:12px;color:var(--text-muted);}
+.host-badges{display:flex;gap:7px;margin-top:8px;flex-wrap:wrap;}
+.hbadge{font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;background:var(--green-pale);color:var(--green);}
+.hbadge.id{background:var(--teal-pale);color:var(--teal);}
+.host-bio{font-size:13px;color:var(--text-light);line-height:1.7;margin-top:12px;}
+.host-actions{display:flex;gap:10px;margin-top:14px;}
+.host-btn{padding:10px 20px;border-radius:9px;font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;border:none;}
+.host-btn-primary{background:var(--teal);color:#fff;}
+.host-btn-primary:hover{background:var(--navy);}
+.host-btn-secondary{background:#fff;color:var(--text);border:1.5px solid var(--border);}
+.host-btn-secondary:hover{border-color:var(--teal);color:var(--teal);}
+
+/* CONTACT MODAL */
+.modal-bg{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+.modal-bg.open{opacity:1;pointer-events:all;}
+.modal{background:#fff;border-radius:20px;padding:36px;width:100%;max-width:480px;position:relative;}
+.modal-close{position:absolute;top:18px;right:22px;background:none;border:none;font-size:22px;color:var(--text-muted);cursor:pointer;}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;color:var(--navy);margin-bottom:6px;}
+.modal-sub{font-size:13px;color:var(--text-muted);margin-bottom:24px;}
+.mf{margin-bottom:14px;}
+.mf label{display:block;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:5px;}
+.mf input,.mf textarea,.mf select{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:9px;font-family:'Jost',sans-serif;font-size:13px;color:var(--text);outline:none;transition:border 0.2s;}
+.mf input:focus,.mf textarea:focus,.mf select:focus{border-color:var(--teal);}
+.mf textarea{min-height:100px;resize:vertical;line-height:1.6;}
+.modal-btn{width:100%;padding:13px;background:var(--navy);border:none;border-radius:10px;color:#fff;font-size:12px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;margin-top:4px;}
+.modal-btn:hover{background:var(--teal);}
+.modal-success{text-align:center;padding:20px 0;}
+.modal-success svg{width:52px;height:52px;fill:var(--green);margin:0 auto 16px;}
+.modal-success h3{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--navy);margin-bottom:8px;}
+.modal-success p{font-size:13px;color:var(--text-muted);}
+
+/* MOBILE BOOKING BAR */
+.mobile-booking-bar{display:none;position:fixed;bottom:0;left:0;right:0;z-index:300;background:#fff;border-top:1px solid var(--border);padding:12px 20px;box-shadow:0 -4px 20px rgba(28,48,38,0.1);}
+.mbb-inner{display:flex;align-items:center;gap:14px;}
+.mbb-price{font-size:20px;font-weight:700;color:var(--navy);}
+.mbb-per{font-size:12px;color:var(--text-muted);}
+.mbb-btn{flex:1;padding:12px;background:var(--teal);border:none;border-radius:10px;color:#fff;font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;}
+
+@media(max-width:960px){
+  .page-inner{grid-template-columns:1fr;gap:32px;}
+  .side-col{position:static;}
+  .nav{padding:0 16px;}
+  .gallery{height:300px;}
+  .gallery-grid{grid-template-columns:1fr 180px;}
+  .amenities-grid{grid-template-columns:1fr 1fr;}
+  .mobile-booking-bar{display:block;}
+  .booking-card{display:none;}
+}
+@media(max-width:600px){
+  .gallery-grid{display:block;}
+  .gallery-grid .g0{height:260px;}
+  .gallery-grid .g1,.gallery-grid .g2{display:none;}
+  .gallery-badge{bottom:10px;left:10px;}
+  .page-inner{padding:20px 16px 100px;}
+  .amenities-grid{grid-template-columns:1fr;}
+  .room-info-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-icon"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg></div>
+    <span class="nav-logo-text">Nomads Croatia</span>
+  </a>
+  <div class="nav-right">
+    <a href="smjestaj.html" class="nav-back"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l4.88-4.88c.39-.39.39-1.03 0-1.42-.39-.39-1.02-.39-1.41 0l-6.59 6.59c-.39.39-.39 1.02 0 1.41l6.59 6.59c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41L7.83 13H20c.55 0 1-.45 1-1s-.45-1-1-1z"/></svg>Nazad</a>
+    <button class="nav-share" onclick="copyLink()">Dijeli</button>
+    <button class="nav-save" id="saveBtn" onclick="toggleSave()">
+      <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+      Spremi
+    </button>
+  </div>
+</nav>
+
+<!-- GALLERY -->
+<div class="gallery" id="gallerySection">
+  <div class="gallery-grid" id="galleryGrid"></div>
+  <div class="gallery-badge" id="galleryBadge"></div>
+  <button class="gallery-all-btn" onclick="openLightbox(0)">
+    <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z"/></svg>
+    Sve fotografije
+  </button>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <button class="lightbox-nav lightbox-prev" onclick="lightboxNav(-1)">&#8249;</button>
+  <img class="lightbox-img" id="lightboxImg" src="" alt="">
+  <button class="lightbox-nav lightbox-next" onclick="lightboxNav(1)">&#8250;</button>
+  <div class="lightbox-counter" id="lightboxCounter"></div>
+</div>
+
+<!-- PAGE CONTENT -->
+<div class="page-inner" id="pageInner">
+  <!-- MAIN COL -->
+  <div class="main-col">
+    <!-- BREADCRUMB -->
+    <div class="breadcrumb">
+      <a href="index.html">Početna</a>
+      <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+      <a href="smjestaj.html">Smještaj</a>
+      <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+      <span id="bcCity">Split</span>
+    </div>
+
+    <!-- TITLE BLOCK -->
+    <div class="title-block">
+      <div class="title-block-loc"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg><span id="titleLoc"></span></div>
+      <h1 class="title-main" id="titleMain"></h1>
+      <div class="title-badges" id="titleBadges"></div>
+      <div class="title-meta" id="titleMeta"></div>
+    </div>
+
+    <div class="sec-div"></div>
+
+    <!-- DESCRIPTION -->
+    <div class="sec-label">O smještaju</div>
+    <div class="description collapsed" id="descBlock"></div>
+    <button class="show-more-btn" id="showMoreBtn" onclick="toggleDesc()">
+      Prikaži više
+      <svg viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>
+    </button>
+
+    <div class="sec-div"></div>
+
+    <!-- COLIVING ROOMS (conditional) -->
+    <div id="colivingSection" style="display:none;">
+      <div class="sec-label">Sobe / Prostori</div>
+      <h2 class="sec-heading" id="colivingTitle"></h2>
+      <div class="rooms-tabs" id="roomsTabs"></div>
+      <div id="roomPanels"></div>
+      <div class="sec-div"></div>
+    </div>
+
+    <!-- AMENITIES -->
+    <div class="sec-label">Sadržaji</div>
+    <div class="amenities-grid" id="amenitiesGrid"></div>
+
+    <div class="sec-div"></div>
+
+    <!-- WIFI DETAIL -->
+    <div class="sec-label">Internet brzina</div>
+    <div class="wifi-detail" id="wifiDetail"></div>
+
+    <div class="sec-div"></div>
+
+    <!-- CALENDAR -->
+    <div class="sec-label">Dostupnost</div>
+    <h2 class="sec-heading">Provjeri slobodne termine</h2>
+    <div class="cal-wrap" id="calWrap">
+      <div class="cal-hdr">
+        <div class="cal-nav-btns">
+          <button class="cal-nav-btn" onclick="calNav(-1)">&#8249;</button>
+          <div class="cal-month-label" id="calMonthLabel"></div>
+          <button class="cal-nav-btn" onclick="calNav(1)">&#8250;</button>
+        </div>
+        <div class="cal-legend">
+          <span><span class="cal-leg-dot" style="background:var(--green-pale);border:1px solid var(--green);"></span>Slobodno</span>
+          <span><span class="cal-leg-dot" style="background:#FEE2E2;"></span>Zauzeto</span>
+          <span><span class="cal-leg-dot" style="background:var(--teal-pale);border:1px solid var(--teal);"></span>Odabrano</span>
+        </div>
+      </div>
+      <div class="cal-grid-wrap">
+        <div class="cal-days-head">
+          <div class="cal-day-lbl">Pon</div><div class="cal-day-lbl">Uto</div><div class="cal-day-lbl">Sri</div>
+          <div class="cal-day-lbl">Čet</div><div class="cal-day-lbl">Pet</div><div class="cal-day-lbl">Sub</div><div class="cal-day-lbl">Ned</div>
+        </div>
+        <div class="cal-days" id="calDays"></div>
+      </div>
+      <div style="padding:0 16px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <div id="calSelection" style="font-size:13px;color:var(--text-muted);">Odaberite datum dolaska</div>
+        <button id="calClearBtn" onclick="clearCalendar()" style="display:none;font-size:11px;font-weight:600;color:var(--teal);background:none;border:none;cursor:pointer;">Očisti odabir</button>
+      </div>
+    </div>
+
+    <div class="sec-div"></div>
+
+    <!-- MAP -->
+    <div class="sec-label">Lokacija</div>
+    <h2 class="sec-heading" id="mapTitle"></h2>
+    <div class="map-section"><div id="detailMap"></div></div>
+    <p style="font-size:12px;color:var(--text-muted);margin-top:8px;">Točna adresa dostupna nakon potvrde rezervacije.</p>
+
+    <div class="sec-div"></div>
+
+    <!-- HOST -->
+    <div class="sec-label">Vlasnik</div>
+    <div class="host-section" id="hostSection"></div>
+  </div>
+
+  <!-- SIDE COL -->
+  <div class="side-col">
+    <div class="booking-card" id="bookingCard"></div>
+  </div>
+</div>
+
+<!-- MOBILE BOOKING BAR -->
+<div class="mobile-booking-bar" id="mobileBookingBar"></div>
+
+<!-- CONTACT MODAL -->
+<div class="modal-bg" id="contactModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modalContent">
+      <h2 class="modal-title">Pošalji upit</h2>
+      <p class="modal-sub" id="modalSub"></p>
+      <div class="mf"><label>Vaše ime</label><input type="text" id="mName" placeholder="Ime i prezime"></div>
+      <div class="mf"><label>Email</label><input type="email" id="mEmail" placeholder="vas@email.com"></div>
+      <div class="mf"><label>Trajanje boravka</label>
+        <select id="mDuration">
+          <option>1 tjedan</option><option>2 tjedna</option><option>1 mjesec</option>
+          <option>2 mjeseca</option><option>3 mjeseca</option><option>6 mjeseci</option>
+        </select>
+      </div>
+      <div class="mf"><label>Poruka</label><textarea id="mMsg" placeholder="Napišite kad planirate doći, koliko vas je…"></textarea></div>
+      <button class="modal-btn" onclick="sendInquiry()">Pošalji upit</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// DEMO DATA
+const LISTINGS = {
+  1:{id:1,title:'Studio s pogledom na more',loc:'Split, Bačvice',city:'Split',type:'Studio',wifi:150,wifiDown:150,wifiUp:80,wifiProvider:'A1 Hrvatska',wifiLabel:'fast',weekPrice:280,monthPrice:950,minStay:'1 tjedan',lat:43.503,lng:16.440,coliving:false,
+    desc:'Moderno uređen studio apartman s prekrasnim pogledom na more i Bačvice plažu. Prostor je idealan za digitalne nomade koji traže miran kutak uz more, ali dovoljno blizu centra Splita.\n\nStudio raspolaže s radnim stolom s ergonomskom stolicom, brzim A1 optičkim internetom (150 Mbps) i klimatizacijom. Kuhinja je potpuno opremljena. Trajekt do otoka dostupan 5 minuta hoda.',
+    images:['https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200&q=85','https://images.unsplash.com/photo-1484154218962-a197022b5858?w=1200&q=85','https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&q=85','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&q=85'],
+    amenities:[{i:'🖥️',l:'Radni stol'},{i:'🪑',l:'Ergonomska stolica'},{i:'❄️',l:'Klimatizacija'},{i:'🍳',l:'Kuhinja'},{i:'🏊',l:'Plaža 2 min'},{i:'🚗',l:'Parking'},{i:'🖨️',l:'Printer'},{i:'📺',l:'TV 55"'},{i:'☕',l:'Kava/čaj'},{i:'🧺',l:'Perilica rublja'},{i:'🛗',l:'Lift'},{i:'🔒',l:'Sigurna brava'}],
+    bookedDays:[3,4,5,12,13,14,15,22,23],
+    host:{name:'Marko Perić',since:'2021',img:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80',listings:3,bio:'Domicilni Splićanin, iznajmljujem digitalne nomade već 4 godine. Volim pomoći gostima da otkriju pravu Dalmaciju.',verified:true,fast:true}
+  },
+  2:{id:2,title:'Coliving Prostor — Nomad House Dubrovnik',loc:'Dubrovnik, Stari grad',city:'Dubrovnik',type:'Coliving',wifi:200,wifiDown:200,wifiUp:120,wifiProvider:'HT/T-Com',wifiLabel:'fast',weekPrice:320,monthPrice:1100,minStay:'2 tjedna',lat:42.650,lng:18.094,coliving:true,
+    desc:'Nomad House Dubrovnik je coliving prostor za digitalne nomade koji žele živjeti blizu Starog grada. Kuća ima 4 individualne sobe s vlastitim kupaonicom, zajedničku kuhinju, terasu s pogledom na more i brzi optički internet.\n\nSvaka soba ima vlastiti radni stol i ključ. Zajednički prostori uključuju veliku kuhinju, salon i terasu. Organiziramo nomad meetupe svaki tjedan.',
+    images:['https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&q=85','https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1200&q=85','https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=1200&q=85','https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1200&q=85'],
+    rooms:[
+      {id:'r1',name:'Soba 1 — Pogled na more',type:'Privatna soba',size:'18m²',bed:'Bračni krevet',weekPrice:320,monthPrice:1100,available:true,
+       desc:'Prostrana privatna soba s vlastitom kupaonicom i balkonom s pogledom na Jadran. Idealna za solo nomade koji žele privatnost uz zajednicu.',
+       amenities:['Vlastita kupaonica','Balkon','Radni stol','Sef'],
+       images:['https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80','https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80','https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&q=80']},
+      {id:'r2',name:'Soba 2 — Vrtna soba',type:'Privatna soba',size:'15m²',bed:'Bračni krevet',weekPrice:280,monthPrice:950,available:true,
+       desc:'Mirna soba s pogledom na mediteranski vrt. Tiha i ugodna, idealna za fokusiran rad.',
+       amenities:['Privatna kupaoncia','Vrt pristup','Radni stol','AC'],
+       images:['https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80','https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=80']},
+      {id:'r3',name:'Soba 3 — Kompaktna',type:'Privatna soba',size:'12m²',bed:'Jednostruki krevet',weekPrice:220,monthPrice:780,available:false,
+       desc:'Manji ali funkcionalan prostor — savršen za nomade koji traže pristupačnu opciju u središtu Dubrovnika.',
+       amenities:['Dijeli kupaonicu','Radni stol','Ormar'],
+       images:['https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&q=80']},
+      {id:'r4',name:'Soba 4 — Studio Suite',type:'Mini studio',size:'22m²',bed:'Bračni krevet + sofa',weekPrice:380,monthPrice:1280,available:true,
+       desc:'Najveći prostor u kući s vlastitom kuhinjom i dnevnim boravkom. Za one koji žele potpunu privatnost uz prednosti colivinga.',
+       amenities:['Mini kuhinja','Dnevni boravak','Vlastita kupaoncia','Balkon'],
+       images:['https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=800&q=80','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80']}
+    ],
+    amenities:[{i:'🖥️',l:'Radni stol svaka soba'},{i:'☕',l:'Zajednička kuhinja'},{i:'🏊',l:'More 10 min'},{i:'🏢',l:'Coworking 500m'},{i:'📡',l:'Wifi 200 Mbps'},{i:'🛗',l:'Zajednički salon'},{i:'🌿',l:'Terasa'},{i:'🚿',l:'Svaka soba kupaonica'},{i:'🧺',l:'Perilica'},{i:'🔒',l:'Ključ sobe'},{i:'🤝',l:'Tjedni meetup'},{i:'🚗',l:'Parking'}],
+    bookedDays:[8,9,10,11,20,21],
+    host:{name:'Ana Kovač',since:'2020',img:'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&q=80',listings:1,bio:'Pokrenula sam Nomad House jer sama sam bila nomad. Znam što je potrebno — brz internet, miran radni prostor i dobra zajednica.',verified:true,fast:true}
+  },
+  5:{id:5,title:'Nomad Hub Split — Dvokrevetna soba',loc:'Split, Meje',city:'Split',type:'Coliving',wifi:300,wifiDown:300,wifiUp:200,wifiProvider:'A1 Optika',wifiLabel:'fast',weekPrice:190,monthPrice:680,minStay:'1 tjedan',lat:43.510,lng:16.418,coliving:true,
+    desc:'Nomad Hub Split je najveći coliving prostor u Splitu, s 6 soba, zajedničkim coworking prostorom i brzinom interneta od 300 Mbps. Idealno za nomade koji žele zajednicu i profesionalni radni okoliš.\n\nU hubi radimo daily standupe, organiziramo izlete i međusobno pomažemo. Optički internet, stojni stolovi, monitoni — sve na raspolaganju.',
+    images:['https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1200&q=85','https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1200&q=85','https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&q=85'],
+    rooms:[
+      {id:'r1',name:'Soba A — Dvokrevetna',type:'Privatna soba',size:'20m²',bed:'2 × Jednostruki',weekPrice:190,monthPrice:680,available:true,
+       desc:'Prostrana soba za dvoje s dva zasebna radna mjesta, monitorima i ergonomskim stolicama.',
+       amenities:['2 Radna mjesta','2 Monitora','Vlastita kupaoncia','AC'],
+       images:['https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=80','https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80']},
+      {id:'r2',name:'Soba B — Solo Executive',type:'Privatna soba',size:'16m²',bed:'Bračni krevet',weekPrice:240,monthPrice:850,available:true,
+       desc:'Premium sola soba s stojnim stolom i 27" monitorom. Savršena za produktivnost.',
+       amenities:['Stojni stol','27" Monitor','Vlastita kupaoncia'],
+       images:['https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80']},
+    ],
+    amenities:[{i:'💻',l:'Coworking prostor'},{i:'🖥️',l:'Stojni stolovi'},{i:'📺',l:'Vanjski monitori'},{i:'🖨️',l:'Printer/Scanner'},{i:'☕',l:'Kava/snackovi'},{i:'🤝',l:'Daily standupovi'},{i:'🌊',l:'Plaža 15 min'},{i:'🚴',l:'Bicikli'},{i:'📦',l:'Paket primanje'},{i:'🔒',l:'24/7 Pristup'},{i:'🧺',l:'Veš servis'},{i:'📡',l:'300 Mbps Optika'}],
+    bookedDays:[1,2,3,15,16,17,18],
+    host:{name:'Ivan Tomić',since:'2019',img:'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&q=80',listings:2,bio:'Nomad sam 6 godina, sada vodim Nomad Hub Split. Znamo što nomadima treba — brz net, dobri susjedi i veza s lokalnom zajednicom.',verified:true,fast:true}
+  }
+};
+
+// Get listing ID
+const params = new URLSearchParams(location.search);
+const id = parseInt(params.get('id'))||1;
+const listing = LISTINGS[id] || LISTINGS[1];
+
+// Current calendar state
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+let calStart = null;
+let calEnd = null;
+let lightboxImages = [];
+let lightboxIdx = 0;
+let isSaved = false;
+
+// INIT
+document.addEventListener('DOMContentLoaded', () => {
+  renderGallery();
+  renderTitleBlock();
+  renderDesc();
+  renderColiving();
+  renderAmenities();
+  renderWifi();
+  renderCalendar();
+  renderBookingCard();
+  renderHost();
+  renderMobileBar();
+  document.getElementById('modalSub').textContent = `Upit za: ${listing.title}`;
+  initMap();
+  document.getElementById('mapTitle').textContent = `${listing.city} — ${listing.loc.split(',')[1]?.trim()||''}`;
+  document.getElementById('bcCity').textContent = listing.city;
+});
+
+function renderGallery(){
+  lightboxImages = listing.images;
+  const grid = document.getElementById('galleryGrid');
+  const imgs = listing.images;
+  grid.innerHTML = `
+    <div class="g0 gallery-thumb" onclick="openLightbox(0)"><img src="${imgs[0]}" alt="Slika 1" loading="eager"></div>
+    ${imgs[1]?`<div class="gallery-thumb" onclick="openLightbox(1)"><img src="${imgs[1]}" alt="Slika 2" loading="lazy"></div>`:''}
+    ${imgs[2]?`<div class="gallery-thumb ${imgs.length>3?'last':''}" data-more="+ ${imgs.length-3} slika" onclick="openLightbox(2)"><img src="${imgs[2]}" alt="Slika 3" loading="lazy"></div>`:''}
+  `;
+  const badge = document.getElementById('galleryBadge');
+  const wlbl = listing.wifiLabel;
+  badge.innerHTML = `<span class="gbadge gbadge-type">${listing.type}</span><span class="gbadge gbadge-wifi ${wlbl}">⚡ ${listing.wifi} Mbps</span>`;
+}
+
+function openLightbox(idx){
+  lightboxIdx = idx;
+  document.getElementById('lightbox').classList.add('open');
+  updateLightbox();
+  document.body.style.overflow='hidden';
+}
+function closeLightbox(){
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow='';
+}
+function lightboxNav(dir){
+  lightboxIdx = (lightboxIdx + dir + lightboxImages.length) % lightboxImages.length;
+  updateLightbox();
+}
+function updateLightbox(){
+  document.getElementById('lightboxImg').src = lightboxImages[lightboxIdx];
+  document.getElementById('lightboxCounter').textContent = `${lightboxIdx+1} / ${lightboxImages.length}`;
+}
+document.getElementById('lightbox').addEventListener('click', e => { if(e.target===document.getElementById('lightbox')) closeLightbox(); });
+document.addEventListener('keydown', e => {
+  if(e.key==='Escape') closeLightbox();
+  if(e.key==='ArrowLeft') lightboxNav(-1);
+  if(e.key==='ArrowRight') lightboxNav(1);
+});
+
+function renderTitleBlock(){
+  document.getElementById('titleLoc').textContent = listing.loc;
+  document.getElementById('titleMain').textContent = listing.title;
+  const wlbl = listing.wifiLabel;
+  document.getElementById('titleBadges').innerHTML = `
+    <span class="tbadge tbadge-wifi ${wlbl==='fast'?'':'mid'}"><svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>${listing.wifi} Mbps WiFi</span>
+    <span class="tbadge tbadge-type">${listing.type}</span>
+    <span class="tbadge tbadge-min">Min. ${listing.minStay}</span>
+    ${listing.coliving?'<span class="tbadge" style="background:#F3E8FF;color:#7C3AED;">Coliving</span>':''}
+  `;
+  document.getElementById('titleMeta').innerHTML = `
+    <span class="title-meta-item"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>${listing.city}</span>
+    <span class="title-meta-item"><svg viewBox="0 0 24 24"><path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z"/></svg>Tjedni & Mjesečni najam</span>
+    ${listing.host.verified?'<span class="title-meta-item" style="color:var(--green);"><svg viewBox="0 0 24 24" style="fill:var(--green);"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>Verificiran smještaj</span>':''}
+  `;
+}
+
+function renderDesc(){
+  document.getElementById('descBlock').innerHTML = listing.desc.split('\n\n').map(p=>`<p style="margin-bottom:12px;">${p}</p>`).join('');
+}
+
+function toggleDesc(){
+  const db = document.getElementById('descBlock');
+  const btn = document.getElementById('showMoreBtn');
+  db.classList.toggle('collapsed');
+  btn.classList.toggle('open');
+  btn.firstChild.textContent = db.classList.contains('collapsed') ? 'Prikaži više' : 'Prikaži manje';
+}
+
+function renderColiving(){
+  if(!listing.coliving || !listing.rooms) return;
+  const sec = document.getElementById('colivingSection');
+  sec.style.display='block';
+  document.getElementById('colivingTitle').textContent = `${listing.rooms.length} sobe — odaberite vašu`;
+
+  const tabs = document.getElementById('roomsTabs');
+  const panels = document.getElementById('roomPanels');
+  listing.rooms.forEach((r,i) => {
+    const tab = document.createElement('button');
+    tab.className = 'room-tab' + (i===0?' active':'') + (r.available?' avail':'');
+    tab.textContent = r.name;
+    tab.onclick = () => switchRoom(i);
+    tabs.appendChild(tab);
+
+    const panel = document.createElement('div');
+    panel.className = 'room-panel' + (i===0?' active':'');
+    panel.id = `room-panel-${i}`;
+    panel.innerHTML = `
+      <div class="room-gallery">${r.images.map((img,ii)=>`<div class="rg-img" onclick="openRoomLightbox(${i},${ii})"><img src="${img}" alt="${r.name} slika ${ii+1}" loading="lazy"></div>`).join('')}</div>
+      <div class="room-info-grid">
+        <div class="room-stat"><div class="room-stat-lbl">Tjedno</div><div class="room-stat-val">€${r.weekPrice}<small>/tjed.</small></div></div>
+        <div class="room-stat"><div class="room-stat-lbl">Mjesečno</div><div class="room-stat-val">€${r.monthPrice}<small>/mj.</small></div></div>
+        <div class="room-stat"><div class="room-stat-lbl">Veličina</div><div class="room-stat-val">${r.size}</div></div>
+        <div class="room-stat"><div class="room-stat-lbl">Krevet</div><div class="room-stat-val" style="font-size:13px;font-weight:500;">${r.bed}</div></div>
+      </div>
+      <div class="room-desc">${r.desc}</div>
+      <div class="room-amenities">${r.amenities.map(a=>`<span class="ramtag">${a}</span>`).join('')}</div>
+      ${!r.available?'<div style="margin-top:14px;padding:12px 16px;background:#FEF2F2;border-radius:10px;color:#B91C1C;font-size:13px;font-weight:600;">⛔ Soba trenutno zauzeta</div>':''}
+      <button onclick="openContactModal()" style="margin-top:14px;width:100%;padding:12px;background:var(--teal);border:none;border-radius:10px;color:#fff;font-size:12px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;">Upitaj za ovu sobu</button>
+    `;
+    panels.appendChild(panel);
+  });
+}
+
+function switchRoom(idx){
+  document.querySelectorAll('.room-tab').forEach((t,i)=>t.classList.toggle('active',i===idx));
+  document.querySelectorAll('.room-panel').forEach((p,i)=>p.classList.toggle('active',i===idx));
+}
+
+function openRoomLightbox(roomIdx, imgIdx){
+  lightboxImages = listing.rooms[roomIdx].images;
+  lightboxIdx = imgIdx;
+  document.getElementById('lightbox').classList.add('open');
+  updateLightbox();
+  document.body.style.overflow='hidden';
+}
+
+function renderAmenities(){
+  document.getElementById('amenitiesGrid').innerHTML = listing.amenities.map(a=>`
+    <div class="amenity">
+      <div class="amenity-icon">${a.i}</div>
+      <div class="amenity-label">${a.l}</div>
+    </div>`).join('');
+}
+
+function renderWifi(){
+  const {wifi,wifiDown,wifiUp,wifiProvider,wifiLabel} = listing;
+  const bars = [1,2,3,4,5].map((b,i) => {
+    const h = 12 + i*7;
+    const isActive = (wifiLabel==='fast' && i<5) || (wifiLabel==='mid' && i<3) || (wifiLabel==='slow' && i<2);
+    return `<div class="wifi-bar${isActive?' active '+wifiLabel:''}" style="width:10px;height:${h}px;"></div>`;
+  }).join('');
+  document.getElementById('wifiDetail').innerHTML = `
+    <div class="wifi-detail-top">
+      <div class="wifi-detail-title">Izmjerena brzina interneta</div>
+      <div style="display:flex;align-items:flex-end;gap:4px;">${bars}</div>
+    </div>
+    <div style="display:flex;align-items:flex-end;margin-bottom:16px;">
+      <div class="wifi-speed-big">${wifiDown}</div>
+      <span class="wifi-unit">Mbps</span>
+    </div>
+    <div class="wifi-detail-row">
+      <div class="wifi-stat"><div class="wifi-stat-lbl">Download</div><div class="wifi-stat-val">${wifiDown} <small>Mbps</small></div></div>
+      <div class="wifi-stat"><div class="wifi-stat-lbl">Upload</div><div class="wifi-stat-val">${wifiUp} <small>Mbps</small></div></div>
+    </div>
+    <div class="wifi-provider">Pružatelj: ${wifiProvider} · Optički kabel</div>`;
+}
+
+// CALENDAR
+function renderCalendar(){
+  const months = ['Siječanj','Veljača','Ožujak','Travanj','Svibanj','Lipanj','Srpanj','Kolovoz','Rujan','Listopad','Studeni','Prosinac'];
+  document.getElementById('calMonthLabel').textContent = `${months[calMonth]} ${calYear}`;
+  const days = document.getElementById('calDays');
+  days.innerHTML = '';
+  const today = new Date();
+  const firstDay = new Date(calYear, calMonth, 1);
+  let startDow = firstDay.getDay(); if(startDow===0) startDow=7;
+  const totalDays = new Date(calYear, calMonth+1, 0).getDate();
+  for(let i=1;i<startDow;i++) days.innerHTML += `<div class="cal-day empty"></div>`;
+  for(let d=1;d<=totalDays;d++){
+    const date = new Date(calYear, calMonth, d);
+    const isPast = date < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const isBooked = listing.bookedDays.includes(d) && calMonth === new Date().getMonth();
+    const isToday = d===today.getDate() && calMonth===today.getMonth() && calYear===today.getFullYear();
+    let cls = 'cal-day ';
+    if(isPast) cls += 'past';
+    else if(isBooked) cls += 'booked';
+    else cls += 'available';
+    if(isToday) cls += ' today';
+    if(calStart && calStart.d===d && calStart.m===calMonth && calStart.y===calYear) cls += ' selected start-range';
+    if(calEnd && calEnd.d===d && calEnd.m===calMonth && calEnd.y===calYear) cls += ' selected end-range';
+    if(calStart && calEnd){
+      const ts = new Date(calStart.y,calStart.m,calStart.d).getTime();
+      const te = new Date(calEnd.y,calEnd.m,calEnd.d).getTime();
+      const td = date.getTime();
+      if(td>ts && td<te) cls += ' in-range';
+    }
+    days.innerHTML += `<div class="${cls}" onclick="calDayClick(${d},${calMonth},${calYear},${isPast||isBooked})">${d}</div>`;
+  }
+}
+
+function calNav(dir){
+  calMonth += dir;
+  if(calMonth>11){calMonth=0;calYear++;}
+  if(calMonth<0){calMonth=11;calYear--;}
+  renderCalendar();
+}
+
+function calDayClick(d,m,y,disabled){
+  if(disabled) return;
+  if(!calStart || (calStart && calEnd)){
+    calStart = {d,m,y}; calEnd = null;
+    document.getElementById('calClearBtn').style.display='inline';
+    document.getElementById('calSelection').textContent = `Dolazak: ${d}.${m+1}.${y}`;
+  } else {
+    const ts = new Date(calStart.y,calStart.m,calStart.d).getTime();
+    const te = new Date(y,m,d).getTime();
+    if(te<=ts){ calStart={d,m,y}; document.getElementById('calSelection').textContent=`Dolazak: ${d}.${m+1}.${y}`; }
+    else {
+      calEnd = {d,m,y};
+      const nights = Math.round((te-ts)/(1000*60*60*24));
+      const weeks = Math.floor(nights/7);
+      document.getElementById('calSelection').textContent = `${calStart.d}.${calStart.m+1} – ${d}.${m+1}.${y} · ${nights} noć${nights===1?'':'i'} (${weeks} tjed${weeks===1?'an':'ana'})`;
+    }
+  }
+  renderCalendar();
+}
+
+function clearCalendar(){
+  calStart=null; calEnd=null;
+  document.getElementById('calClearBtn').style.display='none';
+  document.getElementById('calSelection').textContent='Odaberite datum dolaska';
+  renderCalendar();
+}
+
+function renderBookingCard(){
+  const l = listing;
+  document.getElementById('bookingCard').innerHTML = `
+    <div class="booking-price-row">
+      <div><span class="booking-price-week">€${l.weekPrice}</span><span class="booking-price-per">/ tjedan</span></div>
+      <div class="booking-price-month">€${l.monthPrice} / mj.</div>
+    </div>
+    <div class="booking-tabs">
+      <button class="booking-tab active" onclick="switchBookingTab('weekly',this)">Tjedni</button>
+      <button class="booking-tab" onclick="switchBookingTab('monthly',this)">Mjesečni</button>
+    </div>
+    <div class="booking-field"><label>Dolazak</label><input type="date" class="booking-input" id="bDateIn" onchange="updateBookingSummary()"></div>
+    <div class="booking-field"><label>Trajanje</label>
+      <select class="booking-input" id="bDuration" onchange="updateBookingSummary()">
+        <option value="1">1 tjedan</option><option value="2">2 tjedna</option>
+        <option value="4">1 mjesec</option><option value="8">2 mjeseca</option><option value="12">3 mjeseca</option>
+      </select>
+    </div>
+    <div class="booking-summary" id="bookingSummary">
+      <div class="booking-summary-row"><span>1 tjedan × €${l.weekPrice}</span><span>€${l.weekPrice}</span></div>
+      <div class="booking-summary-row"><span>Ukupno (bez provizije)</span><span>€${l.weekPrice}</span></div>
+    </div>
+    <button class="booking-btn" onclick="openContactModal()">Pošalji upit</button>
+    <div class="booking-note">Nema naknade rezervacije · Direktan kontakt s vlasnikom</div>
+    <div class="booking-host">
+      <img class="booking-host-av" src="${l.host.img}" alt="${l.host.name}">
+      <div>
+        <div class="booking-host-name">${l.host.name}</div>
+        <div class="booking-host-sub">Na platformi od ${l.host.since}</div>
+        ${l.host.verified?'<div class="booking-host-badge">✓ Verificiran</div>':''}
+      </div>
+      <button class="booking-contact-btn" onclick="openContactModal()">Poruka</button>
+    </div>`;
+}
+
+let bookingMode = 'weekly';
+function switchBookingTab(mode, btn){
+  bookingMode = mode;
+  document.querySelectorAll('.booking-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  const durSel = document.getElementById('bDuration');
+  if(mode==='weekly'){
+    durSel.innerHTML = `<option value="1">1 tjedan</option><option value="2">2 tjedna</option><option value="3">3 tjedna</option>`;
+  } else {
+    durSel.innerHTML = `<option value="4">1 mjesec</option><option value="8">2 mjeseca</option><option value="12">3 mjeseca</option><option value="24">6 mjeseci</option>`;
+  }
+  updateBookingSummary();
+}
+
+function updateBookingSummary(){
+  const dur = parseInt(document.getElementById('bDuration').value)||1;
+  const pricePerWeek = listing.weekPrice;
+  const total = dur * pricePerWeek;
+  const weeks = dur;
+  const months = Math.floor(weeks/4);
+  document.getElementById('bookingSummary').innerHTML = `
+    <div class="booking-summary-row"><span>${weeks} tjed. × €${pricePerWeek}</span><span>€${total}</span></div>
+    ${months>=1&&weeks%4===0?`<div class="booking-summary-row"><span>Popust za ${months} mj.</span><span style="color:var(--green);">-€${Math.round(total*0.05)}</span></div>`:''}
+    <div class="booking-summary-row"><span>Ukupno (bez provizije)</span><span>€${months>=1&&weeks%4===0?total-Math.round(total*0.05):total}</span></div>`;
+}
+
+function renderMobileBar(){
+  document.getElementById('mobileBookingBar').innerHTML = `
+    <div class="mbb-inner">
+      <div><div class="mbb-price">€${listing.weekPrice}</div><div class="mbb-per">/ tjedan</div></div>
+      <button class="mbb-btn" onclick="openContactModal()">Pošalji upit</button>
+    </div>`;
+}
+
+function renderHost(){
+  const h = listing.host;
+  document.getElementById('hostSection').innerHTML = `
+    <img class="host-av-lg" src="${h.img}" alt="${h.name}">
+    <div class="host-info">
+      <div class="host-name">${h.name}</div>
+      <div class="host-meta">Na platformi od ${h.since} · ${h.listings} oglas${h.listings>1?'a':''}</div>
+      <div class="host-badges">
+        ${h.verified?'<span class="hbadge">✓ Verificiran</span>':''}
+        ${h.fast?'<span class="hbadge id">Brz odgovor</span>':''}
+      </div>
+      <div class="host-bio">${h.bio}</div>
+      <div class="host-actions">
+        <button class="host-btn host-btn-primary" onclick="openContactModal()">Pošalji poruku</button>
+        <button class="host-btn host-btn-secondary">Profil vlasnika</button>
+      </div>
+    </div>`;
+}
+
+function toggleSave(){
+  isSaved = !isSaved;
+  const btn = document.getElementById('saveBtn');
+  btn.style.color = isSaved ? '#EF4444' : '';
+  btn.querySelector('svg').style.fill = isSaved ? '#EF4444' : '';
+  btn.firstChild && (btn.childNodes[1].textContent = ' ' + (isSaved ? 'Spremljeno':'Spremi'));
+}
+
+function copyLink(){
+  navigator.clipboard?.writeText(location.href);
+  const btn = document.querySelector('.nav-share');
+  btn.textContent = 'Kopirano!';
+  setTimeout(()=>btn.textContent='Dijeli',2000);
+}
+
+function openContactModal(){
+  document.getElementById('contactModal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){
+  document.getElementById('contactModal').classList.remove('open');
+  document.body.style.overflow='';
+}
+document.getElementById('contactModal').addEventListener('click', e => {
+  if(e.target===document.getElementById('contactModal')) closeModal();
+});
+
+function sendInquiry(){
+  const name = document.getElementById('mName').value.trim();
+  const email = document.getElementById('mEmail').value.trim();
+  if(!name||!email){ alert('Molimo unesite ime i email.'); return; }
+  document.getElementById('modalContent').innerHTML = `
+    <div class="modal-success">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+      <h3>Upit poslan!</h3>
+      <p>Vlasnik ${listing.host.name} dobit će vaš upit i odgovorit će u roku 24h.</p>
+    </div>`;
+  setTimeout(closeModal, 3000);
+}
+
+function initMap(){
+  if(typeof L==='undefined') return;
+  const map = L.map('detailMap',{zoomControl:true,scrollWheelZoom:false}).setView([listing.lat,listing.lng],14);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'&copy; OpenStreetMap &copy; CARTO',maxZoom:19}).addTo(map);
+  L.circle([listing.lat,listing.lng],{color:'#2A6049',fillColor:'#DFF0E8',fillOpacity:0.5,radius:300}).addTo(map);
+  L.marker([listing.lat,listing.lng],{
+    icon:L.divIcon({className:'',html:'<div style="background:#1C3026;color:#fff;padding:5px 10px;border-radius:8px;font-size:11px;font-weight:700;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.3);">📍 '+listing.city+'</div>',iconAnchor:[40,10]})
+  }).addTo(map);
+}
+</script>
+</body>
+</html>

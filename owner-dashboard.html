@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Owner Dashboard — Nomads Croatia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --navy:#1C3026;--teal:#2A6049;--teal2:#357A5C;--accent:#F59E0B;
+  --cream:#F3F7F4;--border:#D8E8DD;--text:#0D1E28;--muted:#6D9B7E;--light:#3E5F4C;
+  --green:#16A34A;--gp:#DCFCE7;--red:#EF4444;--rp:#FEF2F2;
+  --orange:#EA580C;--op:#FFF7ED;
+  --sidebar:256px;
+}
+html,body{height:100%;font-family:'Jost',sans-serif;background:var(--cream);color:var(--text);-webkit-font-smoothing:antialiased;}
+button,input,textarea,select{font-family:'Jost',sans-serif;}
+a{text-decoration:none;color:inherit;}
+
+/* AUTH */
+#authScreen{position:fixed;inset:0;background:var(--navy);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;}
+.auth-box{background:#fff;border-radius:20px;padding:44px;width:100%;max-width:400px;}
+.auth-logo{font-family:'Cormorant Garamond',serif;font-size:22px;text-align:center;color:var(--navy);margin-bottom:4px;}
+.auth-sub{font-size:10px;text-align:center;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+.auth-badge{display:block;background:var(--teal);color:#fff;font-size:9px;font-weight:700;letter-spacing:0.15em;padding:3px 10px;border-radius:4px;text-transform:uppercase;margin:0 auto 22px;width:fit-content;}
+.auth-tabs{display:flex;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:18px;}
+.auth-tab{flex:1;padding:10px;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;border:none;background:#fff;color:var(--muted);cursor:pointer;}
+.auth-tab.active{background:var(--navy);color:#fff;}
+.af{margin-bottom:12px;}.af label{display:block;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+.af input{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;outline:none;transition:border 0.2s;}
+.af input:focus{border-color:var(--teal);}
+.auth-btn{width:100%;padding:13px;background:var(--navy);border:none;border-radius:10px;color:#fff;font-size:11px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;margin-top:6px;cursor:pointer;transition:background 0.2s;}
+.auth-btn:hover{background:var(--teal);}
+.auth-err{background:var(--rp);border:1px solid #FEB2B2;border-radius:7px;padding:9px 12px;font-size:12px;color:var(--red);margin-bottom:10px;display:none;}
+.auth-hint{font-size:11px;text-align:center;color:var(--muted);margin-top:12px;}
+.auth-hint strong{color:var(--teal);}
+
+/* APP */
+#appScreen{display:none;height:100vh;overflow:hidden;}
+.layout{display:flex;height:100%;}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar);background:var(--navy);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
+.sb-logo{padding:20px 20px 14px;border-bottom:1px solid rgba(255,255,255,0.07);}
+.sb-logo-text{font-family:'Cormorant Garamond',serif;font-size:16px;color:#fff;line-height:1.3;}
+.sb-badge{display:inline-block;background:var(--teal);color:#fff;font-size:8px;font-weight:700;letter-spacing:0.15em;padding:2px 7px;border-radius:3px;text-transform:uppercase;margin-top:4px;}
+.sb-owner{padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:10px;}
+.sb-av{width:34px;height:34px;border-radius:50%;background:var(--teal);color:#fff;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sb-name{font-size:13px;color:#fff;font-weight:500;}
+.sb-role{font-size:10px;color:rgba(255,255,255,0.3);}
+.sb-nav{padding:10px 0;flex:1;}
+.sb-sec{font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.2);padding:10px 20px 4px;}
+.sb-item{display:flex;align-items:center;gap:9px;padding:9px 20px;color:rgba(255,255,255,0.55);font-size:12px;cursor:pointer;transition:all 0.15s;border-left:2px solid transparent;}
+.sb-item:hover{color:#fff;background:rgba(255,255,255,0.04);}
+.sb-item.active{color:#fff;background:rgba(255,255,255,0.07);border-left-color:var(--accent);}
+.sb-cnt{margin-left:auto;background:rgba(255,255,255,0.12);color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;}
+.sb-cnt.red{background:var(--red);}
+.sb-bottom{padding:14px 20px;border-top:1px solid rgba(255,255,255,0.07);}
+.sb-logout{display:flex;align-items:center;gap:7px;color:rgba(255,255,255,0.35);font-size:12px;cursor:pointer;}
+.sb-logout:hover{color:rgba(255,255,255,0.7);}
+
+/* MAIN */
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
+.topbar{padding:16px 26px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.topbar-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:var(--navy);}
+.topbar-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+.topbar-actions{display:flex;gap:10px;}
+.content{padding:22px 26px;flex:1;}
+.section{display:none;}.section.active{display:block;}
+
+/* STATS */
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+.stat-card{background:#fff;border-radius:12px;padding:16px;border:1px solid var(--border);}
+.stat-label{font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.stat-val{font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--navy);line-height:1;}
+.stat-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.stat-trend{font-size:11px;font-weight:600;margin-top:4px;}
+.stat-trend.up{color:var(--green);}.stat-trend.down{color:var(--red);}
+
+/* CARD */
+.card{background:#fff;border-radius:12px;border:1px solid var(--border);overflow:hidden;margin-bottom:16px;}
+.card-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.card-title{font-size:14px;font-weight:600;color:var(--navy);}
+
+/* BUTTONS */
+.btn{padding:7px 14px;border-radius:7px;font-size:11px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;border:none;transition:all 0.2s;cursor:pointer;display:inline-flex;align-items:center;gap:6px;}
+.btn-teal{background:var(--teal);color:#fff;}.btn-teal:hover{background:var(--teal2);}
+.btn-navy{background:var(--navy);color:#fff;}.btn-navy:hover{background:var(--teal);}
+.btn-ol{background:#fff;border:1.5px solid var(--border);color:var(--text);}.btn-ol:hover{border-color:var(--teal);color:var(--teal);}
+.btn-green{background:var(--gp);color:var(--green);border:1px solid var(--green);}
+.btn-red{background:var(--rp);color:var(--red);border:1px solid #FECACA;}
+.btn-accent{background:var(--accent);color:#fff;}
+.btn-sm{padding:5px 10px;font-size:10px;}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;}
+th{padding:9px 13px;text-align:left;font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);background:var(--cream);}
+td{padding:11px 13px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}tr:hover td{background:#F8FBF9;}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;}
+.bp{background:#FEF3C7;color:#D97706;}.ba{background:var(--gp);color:var(--green);}.br{background:var(--rp);color:var(--red);}.bd{background:#F1F5F9;color:#64748B;}.bc{background:var(--gp);color:var(--green);}
+.bw{background:#EDE9FE;color:#7C3AED;}
+
+/* LISTING MGMT CARDS */
+.listing-mgmt-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.lmcard{background:#fff;border-radius:12px;border:1px solid var(--border);overflow:hidden;}
+.lmcard-img{position:relative;height:160px;overflow:hidden;}
+.lmcard-img img{width:100%;height:100%;object-fit:cover;}
+.lmcard-status{position:absolute;top:10px;left:10px;}
+.lmcard-body{padding:14px;}
+.lmcard-title{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--navy);margin-bottom:4px;}
+.lmcard-loc{font-size:11px;color:var(--muted);margin-bottom:10px;}
+.lmcard-stats{display:flex;gap:12px;margin-bottom:12px;}
+.lmcard-stat{text-align:center;}
+.lmcard-stat-val{font-size:16px;font-weight:600;color:var(--navy);}
+.lmcard-stat-lbl{font-size:10px;color:var(--muted);}
+.lmcard-actions{display:flex;gap:7px;}
+
+/* CALENDAR MGMT */
+.cal-mgmt{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.cal-mgmt-card{background:#fff;border-radius:12px;border:1px solid var(--border);padding:18px;}
+.cal-mgmt-title{font-size:14px;font-weight:600;color:var(--navy);margin-bottom:14px;}
+.mini-cal{width:100%;}
+.mini-cal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.mini-cal-month{font-size:13px;font-weight:600;color:var(--navy);}
+.mini-cal-nav{background:none;border:none;font-size:16px;color:var(--muted);cursor:pointer;padding:2px 6px;border-radius:5px;}
+.mini-cal-nav:hover{color:var(--navy);}
+.mini-days-head{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;margin-bottom:6px;}
+.mini-day-lbl{font-size:9px;font-weight:700;letter-spacing:0.08em;color:var(--muted);}
+.mini-days{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.mini-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:11px;border-radius:6px;cursor:pointer;transition:all 0.15s;color:var(--text);}
+.mini-day.empty{cursor:default;}
+.mini-day.past{opacity:0.3;cursor:not-allowed;}
+.mini-day.booked{background:#FEE2E2;color:#B91C1C;font-weight:600;}
+.mini-day.available:hover{background:var(--teal-pale);color:var(--teal);}
+.mini-day.selected{background:var(--navy);color:#fff;}
+.mini-day.today{border:1.5px solid var(--accent);}
+
+/* INQUIRY ITEMS */
+.inquiry-item{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;gap:14px;align-items:flex-start;}
+.inquiry-item:last-child{border-bottom:none;}
+.inquiry-av{width:38px;height:38px;border-radius:50%;background:var(--teal);color:#fff;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.inquiry-body{flex:1;}
+.inquiry-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;}
+.inquiry-name{font-size:13px;font-weight:600;color:var(--navy);}
+.inquiry-time{font-size:11px;color:var(--muted);}
+.inquiry-listing{font-size:11px;color:var(--teal);margin-bottom:5px;}
+.inquiry-msg{font-size:12px;color:var(--light);line-height:1.5;}
+.inquiry-actions{display:flex;gap:7px;margin-top:9px;}
+
+/* PROFILE SECTION */
+.profile-grid{display:grid;grid-template-columns:300px 1fr;gap:20px;}
+.profile-card{background:#fff;border-radius:12px;border:1px solid var(--border);padding:24px;text-align:center;}
+.profile-av{width:80px;height:80px;border-radius:50%;background:var(--teal);color:#fff;font-size:28px;font-weight:600;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--navy);}
+.profile-email{font-size:12px;color:var(--muted);margin-top:3px;}
+.profile-badges{display:flex;gap:6px;justify-content:center;margin-top:10px;flex-wrap:wrap;}
+.profile-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px;}
+.profile-stat{background:var(--cream);border-radius:9px;padding:12px;}
+.profile-stat-val{font-size:20px;font-weight:700;color:var(--navy);}
+.profile-stat-lbl{font-size:10px;color:var(--muted);margin-top:1px;}
+.form-section{background:#fff;border-radius:12px;border:1px solid var(--border);padding:22px;}
+.form-section h3{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.form-field{margin-bottom:14px;}
+.form-field label{display:block;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+.form-field input,.form-field textarea,.form-field select{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:9px;font-family:'Jost',sans-serif;font-size:13px;color:var(--text);outline:none;transition:border 0.2s;}
+.form-field input:focus,.form-field textarea:focus{border-color:var(--teal);}
+
+/* OVERVIEW ALERTS */
+.alert{padding:12px 16px;border-radius:10px;display:flex;align-items:center;gap:12px;margin-bottom:12px;font-size:13px;}
+.alert-info{background:var(--teal-pale);border:1px solid var(--teal-pale2);color:var(--teal);}
+.alert-warn{background:var(--op);border:1px solid #FED7AA;color:var(--orange);}
+.alert-success{background:var(--gp);border:1px solid #BBF7D0;color:var(--green);}
+.alert-icon{font-size:18px;flex-shrink:0;}
+
+/* QUICK ACTIONS */
+.quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px;}
+.qa-card{background:#fff;border-radius:12px;border:1px solid var(--border);padding:18px;text-align:center;cursor:pointer;transition:all 0.2s;}
+.qa-card:hover{border-color:var(--teal);box-shadow:0 2px 12px rgba(42,96,73,0.1);}
+.qa-icon{font-size:24px;margin-bottom:8px;}
+.qa-label{font-size:12px;font-weight:600;color:var(--navy);}
+.qa-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+
+/* TEAL PILL TABS */
+.section-tabs{display:flex;gap:6px;margin-bottom:16px;}
+.stab{padding:6px 14px;border-radius:7px;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;border:1.5px solid var(--border);background:#fff;color:var(--muted);cursor:pointer;transition:all 0.15s;}
+.stab.on{background:var(--teal);color:#fff;border-color:var(--teal);}
+
+/* REVENUE CHART */
+.revenue-chart{height:120px;display:flex;align-items:flex-end;gap:6px;padding:0 4px;}
+.rev-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.rev-bar{width:100%;border-radius:4px 4px 0 0;background:var(--teal-pale);transition:background 0.2s;cursor:pointer;}
+.rev-bar:hover,.rev-bar.current{background:var(--teal);}
+.rev-lbl{font-size:9px;color:var(--muted);}
+
+@media(max-width:900px){
+  .sidebar{display:none;}
+  .stat-grid{grid-template-columns:1fr 1fr;}
+  .listing-mgmt-grid{grid-template-columns:1fr;}
+  .cal-mgmt{grid-template-columns:1fr;}
+  .quick-actions{grid-template-columns:1fr 1fr;}
+  .profile-grid{grid-template-columns:1fr;}
+}
+</style>
+<style>
+.teal-pale{background:var(--teal-pale);}
+</style>
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div id="authScreen">
+  <div class="auth-box">
+    <div class="auth-logo">Nomads Croatia</div>
+    <div class="auth-sub">Digital Nomad Stays · Hrvatska</div>
+    <span class="auth-badge">Owner Portal</span>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuthTab('login',this)">Prijava</button>
+      <button class="auth-tab" onclick="switchAuthTab('register',this)">Registracija</button>
+    </div>
+    <div class="auth-err" id="authErr">Pogrešan email ili lozinka.</div>
+    <div id="loginForm">
+      <div class="af"><label>Email</label><input type="email" id="loginEmail" placeholder="vas@email.com" value="owner@demo.com"></div>
+      <div class="af"><label>Lozinka</label><input type="password" id="loginPass" placeholder="••••••••" value="demo123"></div>
+      <button class="auth-btn" onclick="doLogin()">Prijavi se</button>
+    </div>
+    <div id="registerForm" style="display:none;">
+      <div class="af"><label>Ime i prezime</label><input type="text" id="regName" placeholder="Ivan Horvat"></div>
+      <div class="af"><label>Email</label><input type="email" id="regEmail" placeholder="vas@email.com"></div>
+      <div class="af"><label>Telefon</label><input type="tel" id="regPhone" placeholder="+385 91 234 5678"></div>
+      <div class="af"><label>Lozinka</label><input type="password" id="regPass" placeholder="min 8 znakova"></div>
+      <button class="auth-btn" onclick="doRegister()">Registriraj se besplatno</button>
+    </div>
+    <div class="auth-hint">Demo pristup: <strong>owner@demo.com / demo123</strong></div>
+  </div>
+</div>
+
+<!-- APP SCREEN -->
+<div id="appScreen">
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sb-logo">
+        <div class="sb-logo-text">Nomads Croatia</div>
+        <span class="sb-badge">Owner Dashboard</span>
+      </div>
+      <div class="sb-owner">
+        <div class="sb-av" id="sbAv">M</div>
+        <div>
+          <div class="sb-name" id="sbName">Marko Perić</div>
+          <div class="sb-role">Vlasnik smještaja</div>
+        </div>
+      </div>
+      <div class="sb-nav">
+        <div class="sb-sec">Upravljanje</div>
+        <div class="sb-item active" onclick="showSection('overview',this)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+          Pregled
+        </div>
+        <div class="sb-item" onclick="showSection('listings',this)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+          Moji oglasi
+          <span class="sb-cnt" id="sbListingCnt">2</span>
+        </div>
+        <div class="sb-item" onclick="showSection('inquiries',this)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+          Upiti
+          <span class="sb-cnt red" id="sbInqCnt">3</span>
+        </div>
+        <div class="sb-item" onclick="showSection('calendar',this)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z"/></svg>
+          Kalendar
+        </div>
+        <div class="sb-item" onclick="showSection('revenue',this)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+          Prihodi
+        </div>
+        <div class="sb-sec">Konto</div>
+        <div class="sb-item" onclick="showSection('profile',this)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          Profil
+        </div>
+        <div class="sb-item" onclick="window.location.href='dodaj-oglas.html'">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+          Dodaj oglas
+        </div>
+      </div>
+      <div class="sb-bottom">
+        <div class="sb-logout" onclick="doLogout()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+          Odjava
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+      <div class="topbar">
+        <div>
+          <div class="topbar-title" id="topbarTitle">Pregled</div>
+          <div class="topbar-sub" id="topbarSub">Dobro jutro, Marko · Utorak, 6. svibnja 2025.</div>
+        </div>
+        <div class="topbar-actions">
+          <a href="dodaj-oglas.html" class="btn btn-navy">+ Novi oglas</a>
+        </div>
+      </div>
+
+      <div class="content">
+
+        <!-- OVERVIEW -->
+        <div class="section active" id="sec-overview">
+          <div class="alert alert-success"><span class="alert-icon">✓</span><span>2 oglasa aktivna · Oba verificirana i prikazana posjetiteljima</span></div>
+          <div class="alert alert-warn"><span class="alert-icon">⚠️</span><span>3 nova upita čekaju vaš odgovor — odgovorite u roku 24h za bolje rangiranje</span></div>
+          <div class="stat-grid">
+            <div class="stat-card">
+              <div class="stat-label">Pregledi ovog tjedna</div>
+              <div class="stat-val">248</div>
+              <div class="stat-trend up">↑ 18% vs. prošli tjedan</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Aktivnih upita</div>
+              <div class="stat-val">3</div>
+              <div class="stat-sub">Čekaju odgovor</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Prihod ovog mj.</div>
+              <div class="stat-val">€1.630</div>
+              <div class="stat-trend up">↑ 12% vs. travanj</div>
+            </div>
+          </div>
+          <div class="quick-actions">
+            <div class="qa-card" onclick="showSection('listings',document.querySelectorAll('.sb-item')[1])">
+              <div class="qa-icon">🏠</div>
+              <div class="qa-label">Moji oglasi</div>
+              <div class="qa-sub">Uredi smještaje</div>
+            </div>
+            <div class="qa-card" onclick="showSection('inquiries',document.querySelectorAll('.sb-item')[2])">
+              <div class="qa-icon">✉️</div>
+              <div class="qa-label">Upiti (3)</div>
+              <div class="qa-sub">Nova poruka</div>
+            </div>
+            <div class="qa-card" onclick="showSection('calendar',document.querySelectorAll('.sb-item')[3])">
+              <div class="qa-icon">📅</div>
+              <div class="qa-label">Kalendar</div>
+              <div class="qa-sub">Upravljaj dostupnošću</div>
+            </div>
+            <div class="qa-card" onclick="window.location.href='dodaj-oglas.html'">
+              <div class="qa-icon">➕</div>
+              <div class="qa-label">Novi oglas</div>
+              <div class="qa-sub">Dodaj smještaj</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-hdr">
+              <div class="card-title">Nedavni upiti</div>
+              <button class="btn btn-ol btn-sm" onclick="showSection('inquiries',document.querySelectorAll('.sb-item')[2])">Svi upiti</button>
+            </div>
+            <div id="recentInquiries"></div>
+          </div>
+        </div>
+
+        <!-- LISTINGS -->
+        <div class="section" id="sec-listings">
+          <div class="listing-mgmt-grid" id="listingsMgmtGrid"></div>
+        </div>
+
+        <!-- INQUIRIES -->
+        <div class="section" id="sec-inquiries">
+          <div class="section-tabs">
+            <button class="stab on" onclick="filterInquiries('all',this)">Svi</button>
+            <button class="stab" onclick="filterInquiries('new',this)">Novi (3)</button>
+            <button class="stab" onclick="filterInquiries('answered',this)">Odgovoreno</button>
+          </div>
+          <div class="card">
+            <div id="inquiriesList"></div>
+          </div>
+        </div>
+
+        <!-- CALENDAR -->
+        <div class="section" id="sec-calendar">
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-hdr">
+              <div class="card-title">Odaberi oglas za upravljanje kalendarom</div>
+            </div>
+            <div style="padding:14px 18px;display:flex;gap:10px;">
+              <button class="btn btn-navy btn-sm" onclick="calSelectListing(0,this)">Studio Bačvice</button>
+              <button class="btn btn-ol btn-sm" onclick="calSelectListing(1,this)">Nomad Hub Split</button>
+            </div>
+          </div>
+          <div class="cal-mgmt" id="calMgmt"></div>
+        </div>
+
+        <!-- REVENUE -->
+        <div class="section" id="sec-revenue">
+          <div class="stat-grid">
+            <div class="stat-card">
+              <div class="stat-label">Ukupno 2025.</div>
+              <div class="stat-val">€7.840</div>
+              <div class="stat-trend up">↑ 24% vs. 2024.</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Ovaj mjesec</div>
+              <div class="stat-val">€1.630</div>
+              <div class="stat-sub">Svib. 2025.</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Prosj. po gostu</div>
+              <div class="stat-val">€952</div>
+              <div class="stat-sub">Prosječni boravak 4,2 tjed.</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-hdr">
+              <div class="card-title">Prihod po mjesecima — 2025.</div>
+            </div>
+            <div style="padding:18px 22px;">
+              <div class="revenue-chart" id="revenueChart"></div>
+              <div style="display:flex;justify-content:space-around;margin-top:4px;" id="revenueLabels"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-hdr"><div class="card-title">Detaljan pregled</div></div>
+            <table>
+              <thead><tr><th>Gost</th><th>Oglas</th><th>Period</th><th>Tjedana</th><th>Iznos</th><th>Status</th></tr></thead>
+              <tbody id="revenueTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- PROFILE -->
+        <div class="section" id="sec-profile">
+          <div class="profile-grid">
+            <div>
+              <div class="profile-card">
+                <div class="profile-av" id="profileAv">M</div>
+                <div class="profile-name" id="profileName">Marko Perić</div>
+                <div class="profile-email" id="profileEmail">marko@example.com</div>
+                <div class="profile-badges">
+                  <span class="badge ba">✓ Verificiran</span>
+                  <span class="badge bw">⚡ Brz odgovor</span>
+                </div>
+                <div class="profile-stats">
+                  <div class="profile-stat"><div class="profile-stat-val">2</div><div class="profile-stat-lbl">Aktivna oglasa</div></div>
+                  <div class="profile-stat"><div class="profile-stat-val">4.8</div><div class="profile-stat-lbl">Ocjena</div></div>
+                  <div class="profile-stat"><div class="profile-stat-val">12</div><div class="profile-stat-lbl">Gostiju</div></div>
+                  <div class="profile-stat"><div class="profile-stat-val">2021.</div><div class="profile-stat-lbl">Na platformi</div></div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="form-section">
+                <h3>Osobni podaci</h3>
+                <div class="form-row">
+                  <div class="form-field"><label>Ime</label><input type="text" value="Marko"></div>
+                  <div class="form-field"><label>Prezime</label><input type="text" value="Perić"></div>
+                </div>
+                <div class="form-row">
+                  <div class="form-field"><label>Email</label><input type="email" value="marko@example.com"></div>
+                  <div class="form-field"><label>Telefon</label><input type="tel" value="+385 91 234 5678"></div>
+                </div>
+                <div class="form-field"><label>Kratki opis (vidljiv nomadima)</label><textarea>Domicilni Splićanin, iznajmljujem digitalnim nomadima već 4 godine. Volim pomoći gostima da otkriju pravu Dalmaciju.</textarea></div>
+                <button class="btn btn-teal" onclick="saveProfile()">Spremi promjene</button>
+              </div>
+              <div class="form-section" style="margin-top:16px;">
+                <h3>Promjena lozinke</h3>
+                <div class="form-field"><label>Trenutna lozinka</label><input type="password" placeholder="••••••••"></div>
+                <div class="form-row">
+                  <div class="form-field"><label>Nova lozinka</label><input type="password" placeholder="min 8 znakova"></div>
+                  <div class="form-field"><label>Potvrdi lozinku</label><input type="password" placeholder="ponovite lozinku"></div>
+                </div>
+                <button class="btn btn-navy" onclick="changePassword()">Promijeni lozinku</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// DEMO DATA
+const OWNER = {name:'Marko Perić', email:'owner@demo.com', pass:'demo123'};
+
+const OWNER_LISTINGS = [
+  {id:1,title:'Studio Bačvice',loc:'Split, Bačvice',type:'Studio',status:'approved',views:248,inquiries:2,weekPrice:280,monthPrice:950,img:'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&q=80',bookedDays:[3,4,5,12,13,14]},
+  {id:2,title:'Nomad Hub Split — Soba A',loc:'Split, Meje',type:'Coliving soba',status:'approved',views:189,inquiries:1,weekPrice:190,monthPrice:680,img:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&q=80',bookedDays:[1,2,15,16,17]},
+];
+
+const INQUIRIES = [
+  {id:1,name:'Sarah Miller',email:'sarah@nomad.io',listing:'Studio Bačvice',duration:'1 mjesec',msg:'Zdravo! Zanima me studio za lipanj. Radim remotely za US tvrtku. Je li slobodan 1.6.–1.7.?',time:'Danas, 09:14',status:'new',avatar:'S'},
+  {id:2,name:'Thomas Weber',email:'thomas@freelance.de',listing:'Nomad Hub Split — Soba A',duration:'2 tjedna',msg:'Guten Tag! Mogu li vidjeti sobu prije rezervacije? Dolazim 15.5.',time:'Jučer, 16:32',status:'new',avatar:'T'},
+  {id:3,name:'Marta Silva',email:'marta@dev.pt',listing:'Studio Bačvice',duration:'3 mjeseca',msg:'Bok! Tražim dugoročni smještaj od srpnja do rujna. Interessan mi je vaš studio, ima li popust za 3 mj?',time:'Ped, 11:20',status:'new',avatar:'M'},
+  {id:4,name:'Alex Johnson',email:'alex@remote.io',listing:'Studio Bačvice',duration:'1 tjedan',msg:'Do you have the studio available for 3rd week of June?',time:'Sri, 14:45',status:'answered',avatar:'A'},
+  {id:5,name:'Lisa Kim',email:'lisa@design.co',listing:'Nomad Hub Split — Soba A',duration:'1 mjesec',msg:'Zdravo, zanima me soba za kolovoz. Mogu li platiti na rate?',time:'Uto, 10:12',status:'answered',avatar:'L'},
+];
+
+const REVENUE_DATA = [
+  {month:'Sij',val:820},{month:'Velj',val:960},{month:'Ožu',val:1240},{month:'Tra',val:1450},{month:'Svi',val:1630},{month:'Lip',val:0}
+];
+
+const REVENUE_ROWS = [
+  {guest:'Sarah Miller',listing:'Studio Bačvice',period:'01.06.–01.07.2025.',weeks:4,amount:1120,status:'pending'},
+  {guest:'Alex Johnson',listing:'Studio Bačvice',period:'15.05.–22.05.2025.',weeks:1,amount:280,status:'paid'},
+  {guest:'Lisa Kim',listing:'Nomad Hub Split',period:'01.04.–01.05.2025.',weeks:4,amount:760,status:'paid'},
+  {guest:'Marta Silva',listing:'Studio Bačvice',period:'01.03.–01.04.2025.',weeks:4,amount:1050,status:'paid'},
+];
+
+let calMgmtMonth = new Date().getMonth();
+let calMgmtYear = new Date().getFullYear();
+let selectedListingIdx = 0;
+
+// AUTH
+function switchAuthTab(mode, btn){
+  document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('loginForm').style.display = mode==='login'?'block':'none';
+  document.getElementById('registerForm').style.display = mode==='register'?'block':'none';
+}
+
+function doLogin(){
+  const email = document.getElementById('loginEmail').value;
+  const pass = document.getElementById('loginPass').value;
+  if(email===OWNER.email && pass===OWNER.pass){
+    document.getElementById('authScreen').style.display='none';
+    document.getElementById('appScreen').style.display='block';
+    initApp();
+  } else {
+    document.getElementById('authErr').style.display='block';
+  }
+}
+
+function doRegister(){
+  document.getElementById('authScreen').style.display='none';
+  document.getElementById('appScreen').style.display='block';
+  OWNER.name = document.getElementById('regName').value || 'Novi korisnik';
+  initApp();
+}
+
+function doLogout(){
+  document.getElementById('appScreen').style.display='none';
+  document.getElementById('authScreen').style.display='flex';
+}
+
+// APP
+function initApp(){
+  const name = OWNER.name;
+  document.getElementById('sbAv').textContent = name[0].toUpperCase();
+  document.getElementById('sbName').textContent = name;
+  document.getElementById('profileAv').textContent = name[0].toUpperCase();
+  document.getElementById('profileName').textContent = name;
+  document.getElementById('profileEmail').textContent = OWNER.email;
+  renderRecentInquiries();
+  renderListings();
+  renderInquiries('all');
+  renderCalendarMgmt();
+  renderRevenue();
+  const now = new Date();
+  const days = ['nedjelja','ponedjeljak','utorak','srijeda','četvrtak','petak','subota'];
+  const months = ['siječnja','veljače','ožujka','travnja','svibnja','lipnja','srpnja','kolovoza','rujna','listopada','studenog','prosinca'];
+  document.getElementById('topbarSub').textContent = `Dobrodošli, ${name.split(' ')[0]} · ${days[now.getDay()]}, ${now.getDate()}. ${months[now.getMonth()]} ${now.getFullYear()}.`;
+}
+
+function showSection(id, el){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  if(el) el.classList.add('active');
+  const titles = {overview:'Pregled',listings:'Moji oglasi',inquiries:'Upiti',calendar:'Kalendar',revenue:'Prihodi',profile:'Profil'};
+  document.getElementById('topbarTitle').textContent = titles[id]||id;
+}
+
+function renderRecentInquiries(){
+  const container = document.getElementById('recentInquiries');
+  const recent = INQUIRIES.slice(0,3);
+  container.innerHTML = recent.map(inq => `
+    <div class="inquiry-item">
+      <div class="inquiry-av">${inq.avatar}</div>
+      <div class="inquiry-body">
+        <div class="inquiry-top">
+          <div class="inquiry-name">${inq.name}</div>
+          <div class="inquiry-time">${inq.time}</div>
+        </div>
+        <div class="inquiry-listing">${inq.listing} · ${inq.duration}</div>
+        <div class="inquiry-msg">${inq.msg.substring(0,100)}…</div>
+        <div class="inquiry-actions">
+          ${inq.status==='new'?`<button class="btn btn-teal btn-sm" onclick="replyInquiry(${inq.id})">Odgovori</button><button class="btn btn-ol btn-sm">Odbij</button>`:`<span class="badge bd">Odgovoreno</span>`}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderListings(){
+  document.getElementById('listingsMgmtGrid').innerHTML = OWNER_LISTINGS.map(l => `
+    <div class="lmcard">
+      <div class="lmcard-img">
+        <img src="${l.img}" alt="${l.title}">
+        <div class="lmcard-status">
+          <span class="badge ${l.status==='approved'?'ba':'bp'}">${l.status==='approved'?'Aktivan':'Na čekanju'}</span>
+        </div>
+      </div>
+      <div class="lmcard-body">
+        <div class="lmcard-title">${l.title}</div>
+        <div class="lmcard-loc">📍 ${l.loc} · ${l.type}</div>
+        <div class="lmcard-stats">
+          <div class="lmcard-stat"><div class="lmcard-stat-val">${l.views}</div><div class="lmcard-stat-lbl">Pregledi</div></div>
+          <div class="lmcard-stat"><div class="lmcard-stat-val">${l.inquiries}</div><div class="lmcard-stat-lbl">Upiti</div></div>
+          <div class="lmcard-stat"><div class="lmcard-stat-val">€${l.weekPrice}</div><div class="lmcard-stat-lbl">/ tjedan</div></div>
+          <div class="lmcard-stat"><div class="lmcard-stat-val">€${l.monthPrice}</div><div class="lmcard-stat-lbl">/ mj.</div></div>
+        </div>
+        <div class="lmcard-actions">
+          <a href="oglas.html?id=${l.id}" class="btn btn-ol btn-sm">Pregledaj</a>
+          <button class="btn btn-teal btn-sm">Uredi</button>
+          <button class="btn btn-sm" onclick="showSection('calendar',document.querySelectorAll('.sb-item')[3])" style="background:var(--accent);color:#fff;">Kalendar</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderInquiries(filter){
+  const list = filter==='all' ? INQUIRIES : INQUIRIES.filter(i=>i.status===filter);
+  document.getElementById('inquiriesList').innerHTML = list.map(inq => `
+    <div class="inquiry-item">
+      <div class="inquiry-av">${inq.avatar}</div>
+      <div class="inquiry-body">
+        <div class="inquiry-top">
+          <div class="inquiry-name">${inq.name} <span style="font-weight:400;color:var(--muted);font-size:11px;">${inq.email}</span></div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span class="badge ${inq.status==='new'?'bp':'bd'}">${inq.status==='new'?'Novo':'Odgovoreno'}</span>
+            <div class="inquiry-time">${inq.time}</div>
+          </div>
+        </div>
+        <div class="inquiry-listing">🏠 ${inq.listing} · ⏱ ${inq.duration}</div>
+        <div class="inquiry-msg">${inq.msg}</div>
+        <div class="inquiry-actions">
+          ${inq.status==='new'?`<button class="btn btn-teal btn-sm" onclick="replyInquiry(${inq.id})">Odgovori</button><button class="btn btn-green btn-sm">Potvrdi termin</button><button class="btn btn-ol btn-sm">Odbij</button>`:`<button class="btn btn-ol btn-sm">Pogledaj odgovor</button>`}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function filterInquiries(filter, btn){
+  document.querySelectorAll('.stab').forEach(t=>t.classList.remove('on'));
+  btn.classList.add('on');
+  renderInquiries(filter);
+}
+
+function replyInquiry(id){
+  const inq = INQUIRIES.find(i=>i.id===id);
+  const msg = prompt(`Odgovor za ${inq.name}:\n\n"${inq.msg}"\n\nVaš odgovor:`);
+  if(msg){ inq.status='answered'; renderInquiries('all'); renderRecentInquiries(); document.getElementById('sbInqCnt').textContent = INQUIRIES.filter(i=>i.status==='new').length; alert('Odgovor poslan!'); }
+}
+
+function renderCalendarMgmt(){
+  const container = document.getElementById('calMgmt');
+  const listing = OWNER_LISTINGS[selectedListingIdx];
+  const months = ['Siječanj','Veljača','Ožujak','Travanj','Svibanj','Lipanj','Srpanj','Kolovoz','Rujan','Listopad','Studeni','Prosinac'];
+  const today = new Date();
+  const firstDay = new Date(calMgmtYear, calMgmtMonth, 1);
+  let startDow = firstDay.getDay(); if(startDow===0) startDow=7;
+  const totalDays = new Date(calMgmtYear, calMgmtMonth+1, 0).getDate();
+
+  let daysHTML = '';
+  for(let i=1;i<startDow;i++) daysHTML += `<div class="mini-day empty"></div>`;
+  for(let d=1;d<=totalDays;d++){
+    const date = new Date(calMgmtYear, calMgmtMonth, d);
+    const isPast = date < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const isBooked = listing.bookedDays.includes(d);
+    const isToday = d===today.getDate()&&calMgmtMonth===today.getMonth()&&calMgmtYear===today.getFullYear();
+    let cls = 'mini-day ';
+    if(isPast) cls+='past';
+    else if(isBooked) cls+='booked';
+    else cls+='available';
+    if(isToday) cls+=' today';
+    daysHTML += `<div class="${cls}" onclick="toggleBookedDay(${d})">${d}</div>`;
+  }
+
+  container.innerHTML = `
+    <div class="cal-mgmt-card">
+      <div class="cal-mgmt-title">📅 Kalendar: ${listing.title}</div>
+      <div class="mini-cal">
+        <div class="mini-cal-hdr">
+          <button class="mini-cal-nav" onclick="calMgmtNav(-1)">&#8249;</button>
+          <div class="mini-cal-month">${months[calMgmtMonth]} ${calMgmtYear}</div>
+          <button class="mini-cal-nav" onclick="calMgmtNav(1)">&#8250;</button>
+        </div>
+        <div class="mini-days-head">
+          <div class="mini-day-lbl">P</div><div class="mini-day-lbl">U</div><div class="mini-day-lbl">S</div>
+          <div class="mini-day-lbl">Č</div><div class="mini-day-lbl">P</div><div class="mini-day-lbl">S</div><div class="mini-day-lbl">N</div>
+        </div>
+        <div class="mini-days">${daysHTML}</div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+        <span style="font-size:11px;color:var(--muted);">Klikni dan za promjenu dostupnosti</span>
+      </div>
+    </div>
+    <div class="cal-mgmt-card">
+      <div class="cal-mgmt-title">📋 Legenda i akcije</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:28px;height:28px;border-radius:6px;background:#FEE2E2;border:1px solid #FCA5A5;"></div>
+          <span style="font-size:13px;color:var(--text);">Zauzeto / Blokirano</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:28px;height:28px;border-radius:6px;background:var(--teal-pale);border:1px solid var(--teal);"></div>
+          <span style="font-size:13px;">Slobodno</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:28px;height:28px;border-radius:6px;background:#F1F5F9;border:1.5px solid var(--accent);"></div>
+          <span style="font-size:13px;">Danas</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button class="btn btn-red" onclick="blockPeriod()">🚫 Blokiraj period</button>
+        <button class="btn btn-green" onclick="unblockAll()">✓ Oslobodi sve</button>
+        <button class="btn btn-teal" onclick="syncCalendar()">🔄 Sync s iCal</button>
+      </div>
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Zauzeti dani ovog mj.</div>
+        <div style="font-size:20px;font-weight:700;color:var(--navy);">${listing.bookedDays.length} <span style="font-size:12px;font-weight:400;color:var(--muted);">od ${new Date(calMgmtYear,calMgmtMonth+1,0).getDate()} dana</span></div>
+      </div>
+    </div>`;
+}
+
+function calMgmtNav(dir){
+  calMgmtMonth += dir;
+  if(calMgmtMonth>11){calMgmtMonth=0;calMgmtYear++;}
+  if(calMgmtMonth<0){calMgmtMonth=11;calMgmtYear--;}
+  renderCalendarMgmt();
+}
+
+function calSelectListing(idx, btn){
+  selectedListingIdx = idx;
+  document.querySelectorAll('.btn-navy,.btn-ol').forEach(b=>b.classList.remove('btn-navy'));
+  renderCalendarMgmt();
+}
+
+function toggleBookedDay(d){
+  const listing = OWNER_LISTINGS[selectedListingIdx];
+  const idx = listing.bookedDays.indexOf(d);
+  if(idx>-1) listing.bookedDays.splice(idx,1);
+  else listing.bookedDays.push(d);
+  renderCalendarMgmt();
+}
+
+function blockPeriod(){ alert('Odaberite period: funkcionalnost u full verziji.'); }
+function unblockAll(){ OWNER_LISTINGS[selectedListingIdx].bookedDays=[]; renderCalendarMgmt(); }
+function syncCalendar(){ alert('iCal sync: funkcionalnost u full verziji.'); }
+
+function renderRevenue(){
+  const chart = document.getElementById('revenueChart');
+  const labels = document.getElementById('revenueLabels');
+  const max = Math.max(...REVENUE_DATA.map(r=>r.val));
+  chart.innerHTML = REVENUE_DATA.map((r,i) => `
+    <div class="rev-bar-wrap">
+      <div class="rev-bar ${i===4?'current':''}" style="height:${r.val?Math.round(r.val/max*100):2}px;" title="€${r.val}"></div>
+      <div class="rev-lbl">${r.val?'€'+r.val:'-'}</div>
+    </div>`).join('');
+  labels.innerHTML = REVENUE_DATA.map(r=>`<span style="font-size:9px;color:var(--muted);">${r.month}</span>`).join('');
+  document.getElementById('revenueTable').innerHTML = REVENUE_ROWS.map(r => `
+    <tr>
+      <td><strong>${r.guest}</strong></td>
+      <td style="font-size:12px;color:var(--muted);">${r.listing}</td>
+      <td style="font-size:12px;">${r.period}</td>
+      <td>${r.weeks}</td>
+      <td><strong>€${r.amount}</strong></td>
+      <td><span class="badge ${r.status==='paid'?'ba':'bp'}">${r.status==='paid'?'Plaćeno':'Na čekanju'}</span></td>
+    </tr>`).join('');
+}
+
+function saveProfile(){ alert('Profil spremljen!'); }
+function changePassword(){ alert('Lozinka promijenjena!'); }
+
+// Enter key login
+document.addEventListener('keydown', e => {
+  if(e.key==='Enter' && document.getElementById('authScreen').style.display!=='none'){
+    doLogin();
+  }
+});
+</script>
+</body>
+</html>

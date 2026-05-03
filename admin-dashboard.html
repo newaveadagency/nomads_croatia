@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — Nomads Croatia</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{--navy:#1C3026;--teal:#2A6049;--teal2:#357A5C;--accent:#F59E0B;--cream:#F3F7F4;--border:#D8E8DD;--text:#0D1E28;--muted:#6D9B7E;--light:#3E5F4C;--green:#16A34A;--gp:#DCFCE7;--red:#EF4444;--rp:#FEF2F2;--orange:#EA580C;--op:#FFF7ED;--sidebar:240px;}
+html,body{height:100%;font-family:'Jost',sans-serif;background:var(--cream);color:var(--text);-webkit-font-smoothing:antialiased;}
+button,input,textarea,select{font-family:'Jost',sans-serif;}a{text-decoration:none;color:inherit;}
+#authScreen{position:fixed;inset:0;background:var(--navy);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;}
+.auth-box{background:#fff;border-radius:20px;padding:48px;width:100%;max-width:400px;}
+.auth-logo{font-family:'Cormorant Garamond',serif;font-size:22px;text-align:center;color:var(--navy);margin-bottom:5px;}
+.auth-sub{font-size:10px;text-align:center;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
+.auth-badge{display:block;background:var(--accent);color:#fff;font-size:9px;font-weight:700;letter-spacing:0.15em;padding:3px 10px;border-radius:4px;text-transform:uppercase;margin:0 auto 28px;width:fit-content;}
+.af{margin-bottom:12px;}.af label{display:block;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+.af input{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;outline:none;transition:border 0.2s;}
+.af input:focus{border-color:var(--teal);}
+.auth-btn{width:100%;padding:13px;background:var(--navy);border:none;border-radius:10px;color:#fff;font-size:11px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;margin-top:6px;cursor:pointer;}
+.auth-btn:hover{background:var(--teal);}
+.auth-err{background:var(--rp);border:1px solid #FEB2B2;border-radius:7px;padding:9px 12px;font-size:12px;color:var(--red);margin-bottom:10px;display:none;}
+.auth-hint{font-size:11px;text-align:center;color:var(--muted);margin-top:12px;}.auth-hint strong{color:var(--accent);}
+#appScreen{display:none;height:100vh;overflow:hidden;}
+.layout{display:flex;height:100%;}
+.sidebar{width:var(--sidebar);background:var(--navy);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
+.sb-logo{padding:22px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.07);}
+.sb-logo-text{font-family:'Cormorant Garamond',serif;font-size:15px;color:#fff;line-height:1.3;}
+.sb-logo-badge{display:inline-block;background:var(--accent);color:#fff;font-size:8px;font-weight:700;letter-spacing:0.15em;padding:2px 7px;border-radius:3px;text-transform:uppercase;margin-top:5px;}
+.sb-nav{padding:12px 0;flex:1;}
+.sb-sec{font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.2);padding:10px 20px 4px;}
+.sb-item{display:flex;align-items:center;gap:9px;padding:9px 20px;color:rgba(255,255,255,0.55);font-size:12px;cursor:pointer;transition:all 0.15s;border-left:2px solid transparent;}
+.sb-item:hover{color:#fff;background:rgba(255,255,255,0.04);}
+.sb-item.active{color:#fff;background:rgba(255,255,255,0.07);border-left-color:var(--accent);}
+.sb-badge{margin-left:auto;background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;min-width:18px;text-align:center;}
+.sb-badge.orange{background:var(--orange);}
+.sb-bottom{padding:14px 20px;border-top:1px solid rgba(255,255,255,0.07);}
+.sb-logout{display:flex;align-items:center;gap:7px;color:rgba(255,255,255,0.35);font-size:12px;cursor:pointer;}
+.sb-logout:hover{color:rgba(255,255,255,0.8);}
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
+.topbar{padding:16px 26px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.topbar-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:var(--navy);}
+.topbar-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+.content{padding:22px 26px;flex:1;}
+.section{display:none;}.section.active{display:block;}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px;}
+.stat-card{background:#fff;border-radius:12px;padding:16px;border:1px solid var(--border);}
+.stat-label{font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;}
+.stat-val{font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--navy);line-height:1;}
+.stat-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.stat-trend{font-size:11px;font-weight:600;margin-top:4px;}.stat-trend.up{color:var(--green);}.stat-trend.down{color:var(--red);}
+.card{background:#fff;border-radius:12px;border:1px solid var(--border);overflow:hidden;margin-bottom:16px;}
+.card-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.card-title{font-size:14px;font-weight:600;color:var(--navy);}
+.ftabs{display:flex;gap:4px;}
+.ftab{padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;border:1.5px solid var(--border);background:#fff;color:var(--muted);cursor:pointer;transition:all 0.15s;}
+.ftab.on{background:var(--teal);color:#fff;border-color:var(--teal);}
+table{width:100%;border-collapse:collapse;}
+th{padding:9px 13px;text-align:left;font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);background:var(--cream);}
+td{padding:11px 13px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}tr:hover td{background:#F8FBF9;}
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;}
+.bp{background:#FEF3C7;color:#D97706;}.ba{background:var(--gp);color:var(--green);}.br{background:var(--rp);color:var(--red);}.bd{background:#F1F5F9;color:#64748B;}.bc{background:#DBEAFE;color:#1D4ED8;}.bw{background:#EDE9FE;color:#7C3AED;}
+.btn{padding:6px 13px;border-radius:7px;font-size:11px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;border:none;transition:all 0.2s;cursor:pointer;display:inline-flex;align-items:center;gap:5px;}
+.btn-teal{background:var(--teal);color:#fff;}.btn-teal:hover{background:var(--teal2);}
+.btn-navy{background:var(--navy);color:#fff;}.btn-navy:hover{background:var(--teal);}
+.btn-ol{background:#fff;border:1.5px solid var(--border);color:var(--text);}.btn-ol:hover{border-color:var(--teal);color:var(--teal);}
+.btn-green{background:var(--gp);color:var(--green);border:1px solid #BBF7D0;}.btn-red{background:var(--rp);color:var(--red);border:1px solid #FECACA;}
+.btn-accent{background:var(--accent);color:#fff;}
+.btn-sm{padding:4px 10px;font-size:10px;}
+.td-actions{display:flex;gap:5px;}
+.search-bar{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.search-input{padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'Jost',sans-serif;font-size:12px;color:var(--text);outline:none;transition:border 0.2s;min-width:180px;}
+.search-input:focus{border-color:var(--teal);}
+.search-select{padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'Jost',sans-serif;font-size:12px;color:var(--text);background:#fff;outline:none;cursor:pointer;}
+.alert{padding:11px 15px;border-radius:9px;display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:12px;}
+.alert-warn{background:var(--op);border:1px solid #FED7AA;color:var(--orange);}
+.map-wrap{height:400px;border-radius:12px;overflow:hidden;border:1px solid var(--border);}
+.user-av{width:28px;height:28px;border-radius:50%;background:var(--teal);color:#fff;font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;}
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.mini-chart{height:80px;display:flex;align-items:flex-end;gap:4px;padding:4px;}
+.mc-bar{flex:1;border-radius:3px 3px 0 0;transition:background 0.2s;cursor:pointer;}
+.mc-bar:hover{opacity:0.8;}
+.mc-bar.green{background:var(--green);}
+.mc-bar.teal{background:var(--teal);}
+.mc-bar.orange{background:var(--orange);}
+</style>
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="authScreen">
+  <div class="auth-box">
+    <div class="auth-logo">Nomads Croatia</div>
+    <div class="auth-sub">Platform Administration</div>
+    <span class="auth-badge">Admin Portal</span>
+    <div class="auth-err" id="authErr">Pogrešan email ili lozinka.</div>
+    <div class="af"><label>Email</label><input type="email" id="aEmail" value="admin@nomadscroatia.com"></div>
+    <div class="af"><label>Lozinka</label><input type="password" id="aPass" value="admin2025"></div>
+    <button class="auth-btn" onclick="doLogin()">Prijavi se</button>
+    <div class="auth-hint">Demo: <strong>admin@nomadscroatia.com / admin2025</strong></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appScreen">
+<div class="layout">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-text">Nomads Croatia</div>
+    <span class="sb-logo-badge">Admin</span>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-sec">Platforma</div>
+    <div class="sb-item active" onclick="show('overview',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+      Pregled
+    </div>
+    <div class="sb-item" onclick="show('listings',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      Oglasi
+      <span class="sb-badge orange" id="pendBadge">5</span>
+    </div>
+    <div class="sb-item" onclick="show('users',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+      Korisnici
+    </div>
+    <div class="sb-item" onclick="show('map',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>
+      Karta oglasa
+    </div>
+    <div class="sb-sec">Analytics</div>
+    <div class="sb-item" onclick="show('analytics',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6h-6z"/></svg>
+      Analytics
+    </div>
+    <div class="sb-item" onclick="show('settings',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+      Postavke
+    </div>
+  </div>
+  <div class="sb-bottom">
+    <div class="sb-logout" onclick="doLogout()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+      Odjava
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title" id="topTitle">Pregled platforme</div>
+      <div class="topbar-sub">Nomads Croatia · Admin · zadnje ažuriranje: upravo sad</div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-ol btn-sm" onclick="show('listings',document.querySelectorAll('.sb-item')[1])">Čekaju odobrenje <span style="background:var(--orange);color:#fff;border-radius:4px;padding:1px 5px;font-size:9px;margin-left:4px;" id="pendBtn">5</span></button>
+      <a href="index.html" class="btn btn-navy btn-sm">← Platforma</a>
+    </div>
+  </div>
+  <div class="content">
+
+    <!-- OVERVIEW -->
+    <div class="section active" id="s-overview">
+      <div class="alert alert-warn"><span>⚠️</span><span>5 oglasa čeka odobrenje · 2 korisnika čekaju verifikaciju</span></div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-label">Ukupno oglasa</div><div class="stat-val">340</div><div class="stat-trend up">↑ 12 novih ovaj tjedan</div></div>
+        <div class="stat-card"><div class="stat-label">Aktivnih vlasnika</div><div class="stat-val">128</div><div class="stat-trend up">↑ 4 nova</div></div>
+        <div class="stat-card"><div class="stat-label">Ukupno upita</div><div class="stat-val">1.247</div><div class="stat-sub">Ovaj mjesec: 89</div></div>
+        <div class="stat-card"><div class="stat-label">Posjeti (tjedan)</div><div class="stat-val">14.2k</div><div class="stat-trend up">↑ 8%</div></div>
+      </div>
+      <div class="chart-row">
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">Novi oglasi — zadnjih 7 dana</div></div>
+          <div style="padding:14px 18px 10px;">
+            <div class="mini-chart" id="newListingsChart"></div>
+            <div style="display:flex;justify-content:space-around;margin-top:4px;" id="newListingsLabels"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">Posjeti po lokaciji</div></div>
+          <div style="padding:14px 18px;">
+            <div id="visitsByCity"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">Na čekanju — hitno</div><button class="btn btn-teal btn-sm" onclick="show('listings',document.querySelectorAll('.sb-item')[1])">Vidi sve</button></div>
+        <table><thead><tr><th>Oglas</th><th>Vlasnik</th><th>Lokacija</th><th>Vrsta</th><th>Prijavljeno</th><th>Akcija</th></tr></thead>
+        <tbody id="pendingTable"></tbody></table>
+      </div>
+    </div>
+
+    <!-- LISTINGS -->
+    <div class="section" id="s-listings">
+      <div class="card" style="overflow:visible;">
+        <div class="card-hdr">
+          <div class="card-title">Svi oglasi</div>
+          <div class="ftabs">
+            <button class="ftab on" onclick="filterListings('all',this)">Svi (340)</button>
+            <button class="ftab" onclick="filterListings('pending',this)">Na čekanju (5)</button>
+            <button class="ftab" onclick="filterListings('approved',this)">Aktivni (327)</button>
+            <button class="ftab" onclick="filterListings('rejected',this)">Odbijeni (8)</button>
+          </div>
+        </div>
+        <div class="search-bar">
+          <input type="text" class="search-input" id="listingSearch" placeholder="Pretraži oglas ili vlasnika…" oninput="renderListingsTable()">
+          <select class="search-select" id="listingCity" onchange="renderListingsTable()">
+            <option value="">Svi gradovi</option>
+            <option>Split</option><option>Dubrovnik</option><option>Zagreb</option><option>Rovinj</option><option>Zadar</option>
+          </select>
+          <select class="search-select" id="listingType" onchange="renderListingsTable()">
+            <option value="">Svi tipovi</option>
+            <option>Studio</option><option>Apartman</option><option>Kuća</option><option>Coliving</option>
+          </select>
+        </div>
+        <table><thead><tr><th>Oglas</th><th>Vlasnik</th><th>Lokacija</th><th>WiFi</th><th>Cijena/mj.</th><th>Status</th><th>Akcija</th></tr></thead>
+        <tbody id="listingsTable"></tbody></table>
+      </div>
+    </div>
+
+    <!-- USERS -->
+    <div class="section" id="s-users">
+      <div class="card">
+        <div class="card-hdr">
+          <div class="card-title">Korisnici — Vlasnici</div>
+          <div class="ftabs">
+            <button class="ftab on" onclick="filterUsers('all',this)">Svi (128)</button>
+            <button class="ftab" onclick="filterUsers('verified',this)">Verificirani (112)</button>
+            <button class="ftab" onclick="filterUsers('pending',this)">Na čekanju (2)</button>
+          </div>
+        </div>
+        <div class="search-bar">
+          <input type="text" class="search-input" placeholder="Pretraži korisnika…">
+        </div>
+        <table><thead><tr><th>Korisnik</th><th>Email</th><th>Grad</th><th>Oglasi</th><th>Upiti</th><th>Registriran</th><th>Status</th><th>Akcija</th></tr></thead>
+        <tbody id="usersTable"></tbody></table>
+      </div>
+    </div>
+
+    <!-- MAP -->
+    <div class="section" id="s-map">
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">Karta svih oglasa</div><span style="font-size:12px;color:var(--muted);">340 oglasa u 18 gradova</span></div>
+        <div class="map-wrap"><div id="adminMap"></div></div>
+      </div>
+    </div>
+
+    <!-- ANALYTICS -->
+    <div class="section" id="s-analytics">
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-label">Upiti ovaj mj.</div><div class="stat-val">89</div><div class="stat-trend up">↑ 22%</div></div>
+        <div class="stat-card"><div class="stat-label">Konverzija</div><div class="stat-val">3.8%</div><div class="stat-sub">Pregled → Upit</div></div>
+        <div class="stat-card"><div class="stat-label">Prosj. WiFi</div><div class="stat-val">112</div><div class="stat-sub">Mbps platforma</div></div>
+        <div class="stat-card"><div class="stat-label">Coliving oglasa</div><div class="stat-val">12</div><div class="stat-trend up">↑ 3 nova</div></div>
+      </div>
+      <div class="chart-row">
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">Posjeti po tjednima</div></div>
+          <div style="padding:14px 18px 10px;"><div class="mini-chart" id="weeklyVisits"></div><div style="display:flex;justify-content:space-around;margin-top:4px;" id="weeklyLabels"></div></div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">Tip smještaja distribucija</div></div>
+          <div style="padding:18px;" id="typeDistribution"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">Top 5 oglasa po pregledima</div></div>
+        <table><thead><tr><th>Oglas</th><th>Lokacija</th><th>WiFi</th><th>Pregledi</th><th>Upiti</th><th>Konverzija</th></tr></thead>
+        <tbody id="topListings"></tbody></table>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="section" id="s-settings">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div class="card"><div class="card-hdr"><div class="card-title">Opće postavke</div></div>
+        <div style="padding:18px;">
+          <div style="margin-bottom:14px;"><label style="display:block;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;">Naziv platforme</label><input type="text" class="search-input" value="Nomads Croatia" style="width:100%;"></div>
+          <div style="margin-bottom:14px;"><label style="display:block;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;">Email podrške</label><input type="email" class="search-input" value="support@nomadscroatia.com" style="width:100%;"></div>
+          <div style="margin-bottom:14px;"><label style="display:block;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;">Valuta</label><select class="search-select" style="width:100%;"><option>EUR (€)</option><option>USD ($)</option></select></div>
+          <div style="margin-bottom:14px;"><label style="display:block;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;">Min. WiFi za verificiran oglas (Mbps)</label><input type="number" class="search-input" value="30" style="width:100%;"></div>
+          <button class="btn btn-navy" onclick="alert('Postavke spremljene!')">Spremi</button>
+        </div></div>
+        <div class="card"><div class="card-hdr"><div class="card-title">Verifikacija oglasa</div></div>
+        <div style="padding:18px;">
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;"><input type="checkbox" checked style="width:16px;height:16px;accent-color:var(--teal);"> <span style="font-size:13px;">Automatska objava za verificirane vlasnike</span></label>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;"><input type="checkbox" checked style="width:16px;height:16px;accent-color:var(--teal);"> <span style="font-size:13px;">Obavijest emailom na novi oglas</span></label>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;"><input type="checkbox" style="width:16px;height:16px;accent-color:var(--teal);"> <span style="font-size:13px;">Obavezna provjera WiFi dokumentacije</span></label>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;"><input type="checkbox" checked style="width:16px;height:16px;accent-color:var(--teal);"> <span style="font-size:13px;">Prikaži WiFi badge na kartici oglasa</span></label>
+          </div>
+          <div style="margin-top:20px;padding-top:14px;border-top:1px solid var(--border);">
+            <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:8px;">WiFi Tier Granice</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+              <div><label style="font-size:10px;color:var(--muted);">Brz (zeleno)</label><input type="number" class="search-input" value="100" style="width:100%;"></div>
+              <div><label style="font-size:10px;color:var(--muted);">Srednji (žuto)</label><input type="number" class="search-input" value="30" style="width:100%;"></div>
+              <div><label style="font-size:10px;color:var(--muted);">Spor (crveno)</label><input type="number" class="search-input" value="0" style="width:100%;"></div>
+            </div>
+          </div>
+        </div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+</div>
+
+<script>
+const ADMIN = {email:'admin@nomadscroatia.com', pass:'admin2025'};
+
+const ALL_LISTINGS = [
+  {id:1,title:'Studio Bačvice',owner:'Marko Perić',city:'Split',type:'Studio',wifi:150,price:950,status:'approved',date:'01.05.2025.'},
+  {id:2,title:'Nomad House Dubrovnik',owner:'Ana Kovač',city:'Dubrovnik',type:'Coliving',wifi:200,price:1100,status:'approved',date:'28.04.2025.'},
+  {id:3,title:'Apartman Gornji grad',owner:'Petra Jurić',city:'Zagreb',type:'Apartman',wifi:85,price:780,status:'approved',date:'25.04.2025.'},
+  {id:4,title:'Mirna kuća uz more',owner:'Tin Babić',city:'Rovinj',type:'Kuća',wifi:60,price:1400,status:'approved',date:'22.04.2025.'},
+  {id:5,title:'Nomad Hub Split',owner:'Ivan Tomić',city:'Split',type:'Coliving',wifi:300,price:680,status:'approved',date:'20.04.2025.'},
+  {id:6,title:'Studio s terasom — Pula',owner:'Mia Novak',city:'Pula',type:'Studio',wifi:90,price:860,status:'pending',date:'03.05.2025.'},
+  {id:7,title:'Soba u centru Šibenika',owner:'Luka Bošnjak',city:'Šibenik',type:'Soba',wifi:40,price:480,status:'pending',date:'03.05.2025.'},
+  {id:8,title:'Apartman Vis',owner:'Elena Marić',city:'Vis',type:'Apartman',wifi:55,price:1050,status:'pending',date:'02.05.2025.'},
+  {id:9,title:'Villa Hvar Coliving',owner:'Josip Klarić',city:'Hvar',type:'Coliving',wifi:120,price:1300,status:'pending',date:'02.05.2025.'},
+  {id:10,title:'Studio Zadar Poluotok',owner:'Ana Šimić',city:'Zadar',type:'Studio',wifi:100,price:780,status:'pending',date:'01.05.2025.'},
+  {id:11,title:'Stara kuća Rijeka',owner:'Vito Kolar',city:'Rijeka',type:'Kuća',wifi:25,price:600,status:'rejected',date:'29.04.2025.'},
+];
+
+const ALL_USERS = [
+  {id:1,name:'Marko Perić',email:'marko@example.com',city:'Split',listings:2,inquiries:8,since:'Jan 2021',status:'verified'},
+  {id:2,name:'Ana Kovač',email:'ana@example.com',city:'Dubrovnik',listings:1,inquiries:12,since:'Mar 2020',status:'verified'},
+  {id:3,name:'Petra Jurić',email:'petra@example.com',city:'Zagreb',listings:3,inquiries:5,since:'Jun 2022',status:'verified'},
+  {id:4,name:'Ivan Tomić',email:'ivan@example.com',city:'Split',listings:2,inquiries:15,since:'Nov 2019',status:'verified'},
+  {id:5,name:'Mia Novak',email:'mia@example.com',city:'Pula',listings:1,inquiries:0,since:'May 2025',status:'pending'},
+  {id:6,name:'Luka Bošnjak',email:'luka@example.com',city:'Šibenik',listings:1,inquiries:0,since:'May 2025',status:'pending'},
+];
+
+let listingFilter = 'all';
+let mapInst = null;
+
+function doLogin(){
+  const e=document.getElementById('aEmail').value, p=document.getElementById('aPass').value;
+  if(e===ADMIN.email&&p===ADMIN.pass){
+    document.getElementById('authScreen').style.display='none';
+    document.getElementById('appScreen').style.display='block';
+    initApp();
+  } else { document.getElementById('authErr').style.display='block'; }
+}
+
+function doLogout(){
+  document.getElementById('appScreen').style.display='none';
+  document.getElementById('authScreen').style.display='flex';
+}
+
+function show(id, el){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('s-'+id).classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  if(el)el.classList.add('active');
+  const t={overview:'Pregled platforme',listings:'Upravljanje oglasima',users:'Korisnici',map:'Karta oglasa',analytics:'Analytics',settings:'Postavke'};
+  document.getElementById('topTitle').textContent=t[id]||id;
+  if(id==='map' && !mapInst) setTimeout(initAdminMap, 100);
+}
+
+function initApp(){
+  renderPendingTable();
+  renderListingsTable();
+  renderUsersTable('all');
+  renderAnalytics();
+  renderCharts();
+}
+
+function renderPendingTable(){
+  const pending = ALL_LISTINGS.filter(l=>l.status==='pending').slice(0,5);
+  document.getElementById('pendingTable').innerHTML = pending.map(l=>`
+    <tr>
+      <td><strong>${l.title}</strong></td>
+      <td>${l.owner}</td>
+      <td>${l.city}</td>
+      <td><span class="badge bd">${l.type}</span></td>
+      <td>${l.date}</td>
+      <td class="td-actions">
+        <button class="btn btn-green btn-sm" onclick="approveListing(${l.id})">✓ Odobri</button>
+        <button class="btn btn-red btn-sm" onclick="rejectListing(${l.id})">✕ Odbij</button>
+      </td>
+    </tr>`).join('');
+}
+
+function renderListingsTable(){
+  const search = (document.getElementById('listingSearch')?.value||'').toLowerCase();
+  const city = document.getElementById('listingCity')?.value||'';
+  const type = document.getElementById('listingType')?.value||'';
+  let data = ALL_LISTINGS.filter(l=>{
+    if(listingFilter!=='all'&&l.status!==listingFilter) return false;
+    if(search&&!l.title.toLowerCase().includes(search)&&!l.owner.toLowerCase().includes(search)) return false;
+    if(city&&l.city!==city) return false;
+    if(type&&l.type!==type) return false;
+    return true;
+  });
+  document.getElementById('listingsTable').innerHTML = data.map(l=>`
+    <tr>
+      <td><strong>${l.title}</strong></td>
+      <td>${l.owner}</td>
+      <td>📍 ${l.city}</td>
+      <td><span style="font-weight:600;color:${l.wifi>=100?'var(--green)':l.wifi>=30?'var(--orange)':'var(--red)'};">⚡ ${l.wifi} Mbps</span></td>
+      <td><strong>€${l.price}</strong></td>
+      <td><span class="badge ${l.status==='approved'?'ba':l.status==='pending'?'bp':'br'}">${l.status==='approved'?'Aktivan':l.status==='pending'?'Na čekanju':'Odbijen'}</span></td>
+      <td class="td-actions">
+        <a href="oglas.html?id=${l.id}" class="btn btn-ol btn-sm">Pregledaj</a>
+        ${l.status==='pending'?`<button class="btn btn-green btn-sm" onclick="approveListing(${l.id})">✓</button><button class="btn btn-red btn-sm" onclick="rejectListing(${l.id})">✕</button>`:''}
+        ${l.status==='approved'?`<button class="btn btn-red btn-sm" onclick="rejectListing(${l.id})">Deaktiviraj</button>`:''}
+      </td>
+    </tr>`).join('');
+}
+
+function filterListings(f, btn){
+  listingFilter=f;
+  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('on'));
+  btn.classList.add('on');
+  renderListingsTable();
+}
+
+function approveListing(id){
+  const l=ALL_LISTINGS.find(x=>x.id===id);
+  if(l){l.status='approved';renderListingsTable();renderPendingTable();updateBadges();}
+}
+function rejectListing(id){
+  const l=ALL_LISTINGS.find(x=>x.id===id);
+  if(l){l.status='rejected';renderListingsTable();renderPendingTable();updateBadges();}
+}
+function updateBadges(){
+  const cnt=ALL_LISTINGS.filter(l=>l.status==='pending').length;
+  document.getElementById('pendBadge').textContent=cnt;
+  document.getElementById('pendBtn').textContent=cnt;
+}
+
+function renderUsersTable(f){
+  const data = f==='all'?ALL_USERS:ALL_USERS.filter(u=>u.status===f);
+  document.getElementById('usersTable').innerHTML = data.map(u=>`
+    <tr>
+      <td><div style="display:flex;align-items:center;gap:8px;"><div class="user-av">${u.name[0]}</div><strong>${u.name}</strong></div></td>
+      <td style="font-size:12px;color:var(--muted);">${u.email}</td>
+      <td>${u.city}</td>
+      <td>${u.listings}</td>
+      <td>${u.inquiries}</td>
+      <td style="font-size:12px;color:var(--muted);">${u.since}</td>
+      <td><span class="badge ${u.status==='verified'?'ba':'bp'}">${u.status==='verified'?'Verificiran':'Na čekanju'}</span></td>
+      <td class="td-actions">
+        ${u.status==='pending'?`<button class="btn btn-green btn-sm" onclick="verifyUser(${u.id})">Verificiraj</button>`:''}
+        <button class="btn btn-ol btn-sm">Profil</button>
+      </td>
+    </tr>`).join('');
+}
+
+function filterUsers(f,btn){
+  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('on'));
+  btn.classList.add('on');
+  renderUsersTable(f);
+}
+function verifyUser(id){
+  const u=ALL_USERS.find(x=>x.id===id);
+  if(u){u.status='verified';renderUsersTable('all');}
+}
+
+function renderCharts(){
+  const days=['Pon','Uto','Sri','Čet','Pet','Sub','Ned'];
+  const vals=[3,5,2,4,7,1,3];
+  const max=Math.max(...vals);
+  document.getElementById('newListingsChart').innerHTML=vals.map((v,i)=>`<div class="mc-bar teal" style="height:${Math.round(v/max*70)+10}px;" title="${v} novih"></div>`).join('');
+  document.getElementById('newListingsLabels').innerHTML=days.map(d=>`<span style="font-size:9px;color:var(--muted);">${d}</span>`).join('');
+
+  document.getElementById('visitsByCity').innerHTML=`
+    ${[['Split',34],['Dubrovnik',22],['Zagreb',18],['Zadar',12],['Rovinj',8],['Ostalo',6]].map(([city,pct])=>`
+    <div style="margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;"><span>${city}</span><span style="font-weight:600;">${pct}%</span></div>
+      <div style="height:6px;background:var(--border);border-radius:3px;"><div style="height:100%;width:${pct}%;background:var(--teal);border-radius:3px;"></div></div>
+    </div>`).join('')}`;
+
+  const weekVals=[11200,12800,13400,14200];
+  const wmax=Math.max(...weekVals);
+  document.getElementById('weeklyVisits').innerHTML=weekVals.map(v=>`<div class="mc-bar green" style="height:${Math.round(v/wmax*70)+10}px;" title="${v.toLocaleString()}"></div>`).join('');
+  document.getElementById('weeklyLabels').innerHTML=['T1','T2','T3','T4'].map(w=>`<span style="font-size:9px;color:var(--muted);">${w}</span>`).join('');
+}
+
+function renderAnalytics(){
+  document.getElementById('typeDistribution').innerHTML = `
+    ${[{type:'Apartman',pct:38,color:'var(--teal)'},{type:'Studio',pct:28,color:'var(--navy)'},{type:'Coliving',pct:18,color:'var(--accent)'},{type:'Kuća',pct:12,color:var(--green)},{type:'Ostalo',pct:4,color:'var(--muted)'}].map(t=>`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+      <div style="width:10px;height:10px;border-radius:2px;background:${t.color};flex-shrink:0;"></div>
+      <div style="flex:1;font-size:12px;">${t.type}</div>
+      <div style="width:120px;height:6px;background:var(--border);border-radius:3px;"><div style="height:100%;width:${t.pct}%;background:${t.color};border-radius:3px;"></div></div>
+      <div style="font-size:12px;font-weight:600;width:30px;text-align:right;">${t.pct}%</div>
+    </div>`).join('')}`;
+  document.getElementById('topListings').innerHTML=[
+    {title:'Nomad Hub Split',loc:'Split',wifi:300,views:1240,inq:24,conv:'1.9%'},
+    {title:'Studio Bačvice',loc:'Split',wifi:150,views:980,inq:18,conv:'1.8%'},
+    {title:'Nomad House Dubrovnik',loc:'Dubrovnik',wifi:200,views:856,inq:22,conv:'2.6%'},
+    {title:'Penthouse Zadar',loc:'Zadar',wifi:100,views:742,inq:11,conv:'1.5%'},
+    {title:'Apartman Gornji grad',loc:'Zagreb',wifi:85,views:634,inq:9,conv:'1.4%'},
+  ].map(r=>`<tr><td><strong>${r.title}</strong></td><td>📍 ${r.loc}</td><td style="color:var(--green);font-weight:600;">⚡ ${r.wifi}</td><td>${r.views.toLocaleString()}</td><td>${r.inq}</td><td><strong>${r.conv}</strong></td></tr>`).join('');
+}
+
+function initAdminMap(){
+  mapInst=L.map('adminMap').setView([44.5,16.5],7);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'© CARTO',maxZoom:19}).addTo(mapInst);
+  const pts=[
+    [43.503,16.440,'Split',87],
+    [42.650,18.094,'Dubrovnik',54],
+    [45.815,15.980,'Zagreb',62],
+    [45.081,13.639,'Rovinj',31],
+    [44.119,15.231,'Zadar',28],
+    [43.735,15.895,'Šibenik',18],
+    [43.172,16.441,'Hvar',12],
+    [44.867,13.848,'Pula',22],
+  ];
+  pts.forEach(([lat,lng,name,count])=>{
+    const el=document.createElement('div');
+    el.style.cssText=`background:#1C3026;color:#fff;padding:5px 9px;border-radius:8px;font-size:11px;font-weight:700;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.3);cursor:pointer;`;
+    el.textContent=`${name} (${count})`;
+    L.marker([lat,lng],{icon:L.divIcon({className:'',html:el.outerHTML,iconAnchor:[40,14]})}).bindPopup(`<strong>${name}</strong><br>${count} oglasa`).addTo(mapInst);
+  });
+}
+
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('authScreen').style.display!=='none')doLogin();});
+</script>
+</body>
+</html>

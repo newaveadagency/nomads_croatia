@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dodaj smještaj — Nomads Croatia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{--navy:#1C3026;--teal:#2A6049;--teal2:#357A5C;--teal-pale:#DFF0E8;--accent:#F59E0B;--cream:#F3F7F4;--border:#D8E8DD;--text:#0D1E28;--muted:#6D9B7E;--light:#3E5F4C;--green:#16A34A;--gp:#DCFCE7;--red:#EF4444;--rp:#FEF2F2;}
+html,body{min-height:100%;font-family:'Jost',sans-serif;background:var(--cream);color:var(--text);-webkit-font-smoothing:antialiased;}
+button,input,textarea,select{font-family:'Jost',sans-serif;}a{text-decoration:none;color:inherit;}
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;height:64px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 32px;}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:500;color:var(--navy);display:flex;align-items:center;gap:8px;}
+.nav-logo-icon{width:28px;height:28px;background:var(--navy);border-radius:7px;display:flex;align-items:center;justify-content:center;}
+.nav-logo-icon svg{width:15px;height:15px;fill:#fff;}
+.nav-right{display:flex;align-items:center;gap:14px;}
+.nav-save{font-size:12px;color:var(--muted);}
+.nav-exit{padding:8px 18px;border-radius:8px;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;background:none;border:1.5px solid var(--border);color:var(--text);cursor:pointer;transition:all 0.2s;}
+.nav-exit:hover{border-color:var(--navy);color:var(--navy);}
+/* PROGRESS */
+.progress-bar{height:3px;background:var(--border);}
+.progress-fill{height:100%;background:var(--teal);transition:width 0.4s ease;}
+/* STEP INDICATORS */
+.steps-nav{background:#fff;border-bottom:1px solid var(--border);padding:0 40px;display:flex;overflow-x:auto;}
+.step-indicator{display:flex;align-items:center;gap:8px;padding:14px 20px;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:all 0.2s;}
+.step-indicator.done{color:var(--green);}
+.step-indicator.active{color:var(--teal);border-bottom-color:var(--teal);}
+.step-num{width:22px;height:22px;border-radius:50%;border:2px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;}
+.step-indicator.done .step-num{background:var(--green);border-color:var(--green);color:#fff;}
+/* WIZARD */
+.wizard{max-width:760px;margin:0 auto;padding:44px 24px 120px;}
+.step-eyebrow{font-size:11px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:var(--teal);margin-bottom:10px;}
+.step-title{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:400;color:var(--navy);line-height:1.2;margin-bottom:10px;}
+.step-title em{font-style:italic;color:var(--teal);}
+.step-sub{font-size:14px;color:var(--light);line-height:1.6;margin-bottom:36px;max-width:520px;}
+.step-divider{height:1px;background:var(--border);margin:28px 0;}
+/* FIELDS */
+.field{margin-bottom:20px;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+.field-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px;}
+label{display:block;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;}
+.hint{font-size:11px;color:var(--muted);font-weight:400;letter-spacing:0;text-transform:none;margin-left:6px;}
+input[type=text],input[type=number],input[type=email],input[type=url],textarea,select{width:100%;padding:12px 15px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;color:var(--text);background:#fff;outline:none;transition:border 0.2s,box-shadow 0.2s;}
+input:focus,textarea:focus,select:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(42,96,73,0.08);}
+textarea{resize:vertical;min-height:120px;line-height:1.6;}
+.char-count{text-align:right;font-size:11px;color:var(--muted);margin-top:4px;}
+/* TYPE CARDS */
+.type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:8px;}
+.type-card{border:2px solid var(--border);border-radius:12px;padding:18px 14px;text-align:center;cursor:pointer;transition:all 0.2s;background:#fff;}
+.type-card:hover{border-color:var(--teal-pale);}
+.type-card.selected{border-color:var(--teal);background:var(--teal-pale);}
+.type-card-icon{font-size:28px;margin-bottom:8px;}
+.type-card-label{font-size:13px;font-weight:600;color:var(--navy);}
+.type-card-sub{font-size:11px;color:var(--muted);margin-top:3px;}
+/* STEPPER */
+.stepper{display:flex;align-items:center;gap:0;background:#fff;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;width:fit-content;}
+.stepper-btn{width:42px;height:42px;border:none;background:none;font-size:20px;color:var(--navy);cursor:pointer;transition:background 0.15s;display:flex;align-items:center;justify-content:center;}
+.stepper-btn:hover{background:var(--cream);}
+.stepper-btn:disabled{color:var(--muted);cursor:not-allowed;}
+.stepper-val{min-width:48px;text-align:center;font-size:15px;font-weight:500;border-left:1.5px solid var(--border);border-right:1.5px solid var(--border);padding:0 8px;height:42px;display:flex;align-items:center;justify-content:center;}
+.stepper-row{display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--border);}
+.stepper-row:last-child{border-bottom:none;}
+.stepper-label{font-size:14px;font-weight:500;}
+.stepper-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+/* AMENITIES */
+.am-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.am-item{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:all 0.15s;user-select:none;background:#fff;}
+.am-item:hover{border-color:var(--teal);background:#F4FAF6;}
+.am-item.on{border-color:var(--teal);background:var(--teal-pale);}
+.am-icon{font-size:19px;flex-shrink:0;width:26px;text-align:center;}
+.am-label{font-size:12px;font-weight:500;color:var(--text);}
+.am-item.on .am-label{color:var(--teal);}
+/* WIFI SPEED SELECTOR */
+.wifi-selector{background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px;}
+.wifi-sel-title{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:14px;}
+.wifi-tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.wifi-tier{border:2px solid var(--border);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all 0.2s;background:#fff;}
+.wifi-tier:hover{border-color:var(--border);}
+.wifi-tier.selected.fast{border-color:#16A34A;background:#DCFCE7;}
+.wifi-tier.selected.mid{border-color:#D97706;background:#FEF3C7;}
+.wifi-tier.selected.slow{border-color:#EF4444;background:#FEF2F2;}
+.wifi-tier-emoji{font-size:24px;margin-bottom:6px;}
+.wifi-tier-mbps{font-size:13px;font-weight:700;color:var(--navy);}
+.wifi-tier-desc{font-size:11px;color:var(--muted);margin-top:3px;}
+/* IMAGE UPLOAD */
+.dropzone{border:2px dashed var(--border);border-radius:14px;padding:40px 24px;text-align:center;cursor:pointer;transition:all 0.2s;background:#F8FBF9;position:relative;}
+.dropzone:hover,.dropzone.drag{border-color:var(--teal);background:#EEF8F2;}
+.dropzone input{display:none;}
+.dz-icon{margin:0 auto 14px;width:52px;height:52px;background:var(--cream);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;}
+.dz-title{font-size:15px;font-weight:600;color:var(--navy);margin-bottom:5px;}
+.dz-sub{font-size:12px;color:var(--muted);line-height:1.6;}
+.dz-sub strong{color:var(--teal);}
+.img-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px;}
+.img-card{position:relative;border-radius:10px;overflow:hidden;aspect-ratio:4/3;background:var(--border);}
+.img-card img{width:100%;height:100%;object-fit:cover;}
+.img-del{position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,0.65);border:none;color:#fff;font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;line-height:1;transition:background 0.15s;}
+.img-del:hover{background:var(--red);}
+.img-badge{position:absolute;bottom:6px;left:6px;background:var(--accent);color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;}
+.img-hint{margin-top:12px;padding:12px 14px;background:var(--cream);border-radius:8px;font-size:12px;color:var(--light);line-height:1.6;}
+/* PRICING */
+.pricing-tabs{display:flex;gap:6px;margin-bottom:16px;}
+.ptab{padding:8px 16px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;background:#fff;color:var(--muted);cursor:pointer;transition:all 0.15s;}
+.ptab.on{background:var(--navy);color:#fff;border-color:var(--navy);}
+.price-input-wrap{position:relative;display:flex;align-items:center;}
+.price-input-wrap .currency{position:absolute;left:14px;font-size:16px;color:var(--muted);font-weight:500;}
+.price-input-wrap input{padding-left:32px;}
+.price-input-wrap .unit{position:absolute;right:14px;font-size:13px;color:var(--muted);}
+/* COLIVING */
+.room-builder{background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px;}
+.room-builder-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.room-builder-title{font-size:14px;font-weight:600;color:var(--navy);}
+.room-fields{display:grid;gap:12px;}
+.room-tag{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:var(--teal-pale);border-radius:8px;font-size:12px;color:var(--teal);font-weight:600;}
+/* CALENDAR */
+.avail-wrap{background:#fff;border:1.5px solid var(--border);border-radius:12px;overflow:hidden;}
+.avail-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.avail-month{font-size:15px;font-weight:600;color:var(--navy);}
+.avail-nav{display:flex;gap:8px;}
+.avail-nav button{width:30px;height:30px;border-radius:7px;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-size:15px;color:var(--navy);display:flex;align-items:center;justify-content:center;}
+.avail-nav button:hover{border-color:var(--teal);}
+.avail-grid-wrap{padding:12px 14px;}
+.avail-days-hdr{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px;text-align:center;}
+.avail-day-lbl{font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);}
+.avail-days{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.avail-day{aspect-ratio:1;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.12s;border:1.5px solid transparent;}
+.avail-day.empty{cursor:default;}
+.avail-day.past{opacity:0.3;cursor:not-allowed;}
+.avail-day.blocked{background:#FEE2E2;color:#B91C1C;}
+.avail-day.open:hover{background:var(--teal-pale);border-color:var(--teal);}
+.avail-day.today{border-color:var(--accent);}
+/* BOTTOM BAR */
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;z-index:100;box-shadow:0 -4px 20px rgba(28,48,38,0.07);}
+.bb-left{font-size:12px;color:var(--muted);}
+.bb-right{display:flex;gap:10px;}
+.bb-back{padding:11px 22px;border:1.5px solid var(--border);border-radius:10px;background:#fff;color:var(--text);font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;}
+.bb-back:hover{border-color:var(--teal);color:var(--teal);}
+.bb-next{padding:11px 28px;background:var(--navy);border:none;border-radius:10px;color:#fff;font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;}
+.bb-next:hover{background:var(--teal);}
+
+/* REVIEW STEP */
+.review-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.review-block{background:#fff;border-radius:12px;border:1px solid var(--border);padding:18px;}
+.review-block-title{font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
+.review-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.review-row:last-child{border-bottom:none;}
+.review-key{color:var(--light);}
+.review-val{font-weight:600;color:var(--navy);}
+
+.step-page{display:none;}.step-page.active{display:block;}
+@media(max-width:600px){
+  .wizard{padding:28px 16px 100px;}
+  .nav{padding:0 16px;}
+  .type-grid{grid-template-columns:1fr 1fr;}
+  .am-grid{grid-template-columns:1fr 1fr;}
+  .wifi-tiers{grid-template-columns:1fr;}
+  .field-row,.field-row-3{grid-template-columns:1fr;}
+  .img-grid{grid-template-columns:repeat(3,1fr);}
+  .review-grid{grid-template-columns:1fr;}
+  .steps-nav{padding:0 16px;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-icon"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg></div>
+    Nomads Croatia
+  </a>
+  <div class="nav-right">
+    <span class="nav-save" id="autosaveStatus">Nespremljeno</span>
+    <button class="nav-exit" onclick="if(confirm('Napustiti wizard?')) window.location.href='owner-dashboard.html'">Izlaz</button>
+  </div>
+</nav>
+
+<!-- PROGRESS -->
+<div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:16.6%"></div></div>
+
+<!-- STEP INDICATORS -->
+<div class="steps-nav">
+  <div class="step-indicator active" id="si0" onclick="goToStep(0)"><div class="step-num">1</div>Osnove</div>
+  <div class="step-indicator" id="si1" onclick="goToStep(1)"><div class="step-num">2</div>Detalji</div>
+  <div class="step-indicator" id="si2" onclick="goToStep(2)"><div class="step-num">3</div>Internet & sadržaji</div>
+  <div class="step-indicator" id="si3" onclick="goToStep(3)"><div class="step-num">4</div>Fotografije</div>
+  <div class="step-indicator" id="si4" onclick="goToStep(4)"><div class="step-num">5</div>Cijene</div>
+  <div class="step-indicator" id="si5" onclick="goToStep(5)"><div class="step-num">6</div>Dostupnost</div>
+  <div class="step-indicator" id="si6" onclick="goToStep(6)"><div class="step-num">7</div>Pregled</div>
+</div>
+
+<!-- WIZARD CONTENT -->
+<div class="wizard">
+
+  <!-- STEP 1: OSNOVE -->
+  <div class="step-page active" id="step0">
+    <div class="step-eyebrow">Korak 1 od 7</div>
+    <h1 class="step-title">Kakav je vaš<br><em>smještaj?</em></h1>
+    <p class="step-sub">Odaberite tip smještaja koji oglašavate. Ovo pomaže nomadima da brzo pronađu pravi prostor.</p>
+    <div class="type-grid" id="typeGrid"></div>
+    <div class="step-divider"></div>
+    <div class="field">
+      <label>Naziv oglasa <span class="hint">(vidljiv nomadima)</span></label>
+      <input type="text" id="fTitle" placeholder="npr. Studio s pogledom na more — Split Bačvice" maxlength="80" oninput="updateChar('fTitle','titleChar',80)">
+      <div class="char-count"><span id="titleChar">0</span>/80</div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Grad</label>
+        <select id="fCity">
+          <option value="">Odaberite grad</option>
+          <option>Split</option><option>Dubrovnik</option><option>Zagreb</option><option>Rovinj</option>
+          <option>Zadar</option><option>Šibenik</option><option>Pula</option><option>Hvar</option>
+          <option>Trogir</option><option>Makarska</option><option>Rijeka</option><option>Opatija</option>
+          <option>Brač</option><option>Vis</option><option>Korčula</option><option>Bol</option>
+          <option>Poreč</option><option>Umag</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Kvart / ulica</label>
+        <input type="text" id="fArea" placeholder="npr. Bačvice, Stari grad, Centar…">
+      </div>
+    </div>
+    <div class="field">
+      <label>Kratki opis <span class="hint">(prikazano u pretrazi)</span></label>
+      <textarea id="fDesc" placeholder="Opišite smještaj, okruženje, blizinu plaže, coworking prostora…" maxlength="1200" oninput="updateChar('fDesc','descChar',1200)"></textarea>
+      <div class="char-count"><span id="descChar">0</span>/1200</div>
+    </div>
+  </div>
+
+  <!-- STEP 2: DETALJI -->
+  <div class="step-page" id="step1">
+    <div class="step-eyebrow">Korak 2 od 7</div>
+    <h1 class="step-title">Prostori &<br><em>kapacitet</em></h1>
+    <p class="step-sub">Koliko prostora i mjesta za spavanje ima vaš smještaj?</p>
+    <div id="roomsContainer">
+      <div class="stepper-row"><div><div class="stepper-label">Spavaće sobe</div><div class="stepper-sub">Broj zasebnih soba za spavanje</div></div><div class="stepper"><button class="stepper-btn" onclick="adj('beds',-1)" id="bedsM">−</button><div class="stepper-val" id="bedsVal">1</div><button class="stepper-btn" onclick="adj('beds',1)">+</button></div></div>
+      <div class="stepper-row"><div><div class="stepper-label">Kupaone</div><div class="stepper-sub">Privatne i dijeljene</div></div><div class="stepper"><button class="stepper-btn" onclick="adj('bath',-1)" id="bathM">−</button><div class="stepper-val" id="bathVal">1</div><button class="stepper-btn" onclick="adj('bath',1)">+</button></div></div>
+      <div class="stepper-row"><div><div class="stepper-label">Maksimalno gostiju</div><div class="stepper-sub">Istovremeno u smještaju</div></div><div class="stepper"><button class="stepper-btn" onclick="adj('guests',-1)" id="guestsM">−</button><div class="stepper-val" id="guestsVal">1</div><button class="stepper-btn" onclick="adj('guests',1)">+</button></div></div>
+      <div class="stepper-row"><div><div class="stepper-label">Radna mjesta</div><div class="stepper-sub">Stolovi za rad s laptopom</div></div><div class="stepper"><button class="stepper-btn" onclick="adj('desks',-1)" id="desksM">−</button><div class="stepper-val" id="desksVal">1</div><button class="stepper-btn" onclick="adj('desks',1)">+</button></div></div>
+    </div>
+    <!-- COLIVING ROOMS -->
+    <div id="colivingRooms" style="display:none;">
+      <div class="step-divider"></div>
+      <div class="step-eyebrow">Coliving — Sobe</div>
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--navy);margin-bottom:10px;">Dodaj svaku sobu posebno</h3>
+      <p style="font-size:13px;color:var(--light);line-height:1.6;margin-bottom:20px;">Za coliving prostor svaka soba ima vlastitu cijenu, fotografije i opis.</p>
+      <div id="roomsList"></div>
+      <button class="bb-next" style="background:var(--teal);margin-top:4px;" onclick="addRoom()">+ Dodaj sobu</button>
+    </div>
+    <div class="step-divider"></div>
+    <div class="field">
+      <label>Minimalni boravak</label>
+      <select id="fMinStay">
+        <option value="1w">1 tjedan</option>
+        <option value="2w">2 tjedna</option>
+        <option value="1m" selected>1 mjesec</option>
+        <option value="3m">3 mjeseca</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Maksimalni boravak</label>
+      <select id="fMaxStay">
+        <option value="none">Bez ograničenja</option>
+        <option value="3m">3 mjeseca</option>
+        <option value="6m">6 mjeseci</option>
+        <option value="1y">1 godina</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- STEP 3: INTERNET & SADRŽAJI -->
+  <div class="step-page" id="step2">
+    <div class="step-eyebrow">Korak 3 od 7</div>
+    <h1 class="step-title"><em>WiFi</em> i sadržaji</h1>
+    <p class="step-sub">Internet brzina je prioritet #1 za digitalne nomade. Unesite stvarnu izmjerenu brzinu vašeg interneta.</p>
+    <div class="wifi-selector">
+      <div class="wifi-sel-title">🌐 Internet brzina (izmjerena na speedtest.net)</div>
+      <div class="wifi-tiers">
+        <div class="wifi-tier fast" id="wt-fast" onclick="selectWifiTier('fast',150)">
+          <div class="wifi-tier-emoji">⚡</div>
+          <div class="wifi-tier-mbps">100+ Mbps</div>
+          <div class="wifi-tier-desc">Optički / Super brz</div>
+        </div>
+        <div class="wifi-tier mid" id="wt-mid" onclick="selectWifiTier('mid',50)">
+          <div class="wifi-tier-emoji">📶</div>
+          <div class="wifi-tier-mbps">30–100 Mbps</div>
+          <div class="wifi-tier-desc">Standardni / Solidan</div>
+        </div>
+        <div class="wifi-tier slow" id="wt-slow" onclick="selectWifiTier('slow',15)">
+          <div class="wifi-tier-emoji">⚠️</div>
+          <div class="wifi-tier-mbps">&lt; 30 Mbps</div>
+          <div class="wifi-tier-desc">Bazičan</div>
+        </div>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Download brzina <span class="hint">(Mbps)</span></label>
+        <input type="number" id="fWifiDown" placeholder="npr. 150" min="1" max="10000">
+      </div>
+      <div class="field">
+        <label>Upload brzina <span class="hint">(Mbps)</span></label>
+        <input type="number" id="fWifiUp" placeholder="npr. 80" min="1" max="10000">
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Pružatelj interneta</label>
+        <select id="fIsp">
+          <option value="">Odaberite</option>
+          <option>A1 Hrvatska</option><option>HT / T-Com</option><option>Optimus</option>
+          <option>Iskon</option><option>B.net</option><option>Ostalo</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Tip veze</label>
+        <select id="fIspType">
+          <option>Optički kabel (FTTH)</option>
+          <option>Kabelski (DOCSIS)</option>
+          <option>DSL/ADSL</option>
+          <option>4G/5G backup</option>
+        </select>
+      </div>
+    </div>
+    <div class="step-divider"></div>
+    <div class="step-eyebrow">Sadržaji</div>
+    <h3 style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--navy);margin-bottom:12px;">Što je uključeno?</h3>
+    <div class="am-grid" id="amenitiesGrid"></div>
+  </div>
+
+  <!-- STEP 4: FOTOGRAFIJE -->
+  <div class="step-page" id="step3">
+    <div class="step-eyebrow">Korak 4 od 7</div>
+    <h1 class="step-title">Fotografije<br><em>smještaja</em></h1>
+    <p class="step-sub">Kvalitetne fotografije povećavaju broj upita za 3×. Dodajte min. 5 fotografija, počevši s glavnom slikom.</p>
+    <div class="dropzone" id="mainDropzone" onclick="document.getElementById('mainFiles').click()" ondragover="ev.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleDrop(event,'main')">
+      <input type="file" id="mainFiles" multiple accept="image/*" onchange="handleFiles(this.files,'main')">
+      <div class="dz-icon">📸</div>
+      <div class="dz-title">Kliknite ili povucite fotografije</div>
+      <div class="dz-sub">JPG, PNG, WEBP · Max 20MB po slici · <strong>Preporučeno 1920×1080+</strong></div>
+    </div>
+    <div class="img-grid" id="mainImgGrid"></div>
+    <div class="img-hint">💡 Prva fotografija postaje naslovnica oglasa. Prevucite fotografije da promijenite redoslijed. Preporučujemo: dnevni boravak, spavaća soba, radni stol/laptop setup, pogled, kuhinja, kupaonica.</div>
+    <!-- COLIVING ROOM PHOTOS -->
+    <div id="roomPhotosSection" style="display:none;">
+      <div class="step-divider"></div>
+      <div class="step-eyebrow">Fotografije po sobama</div>
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--navy);margin-bottom:12px;">Dodajte slike svake sobe posebno</h3>
+      <div id="roomPhotosList"></div>
+    </div>
+  </div>
+
+  <!-- STEP 5: CIJENE -->
+  <div class="step-page" id="step4">
+    <div class="step-eyebrow">Korak 5 od 7</div>
+    <h1 class="step-title">Cijene &<br><em>uvjeti najma</em></h1>
+    <p class="step-sub">Postavite tjednu i/ili miesečnu cijenu. Nomadi traže oba modela — ponudite oba za više upita.</p>
+    <div class="pricing-tabs">
+      <button class="ptab on" id="pt-weekly" onclick="switchPricingTab('weekly',this)">Tjedna cijena</button>
+      <button class="ptab" id="pt-monthly" onclick="switchPricingTab('monthly',this)">Miesečna cijena</button>
+      <button class="ptab" id="pt-both" onclick="switchPricingTab('both',this)">Oboje</button>
+    </div>
+    <div id="pricingWeekly">
+      <div class="field">
+        <label>Cijena po tjednu</label>
+        <div class="price-input-wrap"><span class="currency">€</span><input type="number" id="fWeekPrice" placeholder="0" min="50" max="9999"><span class="unit">/ tjedan</span></div>
+      </div>
+    </div>
+    <div id="pricingMonthly">
+      <div class="field">
+        <label>Cijena po mjesecu</label>
+        <div class="price-input-wrap"><span class="currency">€</span><input type="number" id="fMonthPrice" placeholder="0" min="100" max="99999"><span class="unit">/ miesec</span></div>
+      </div>
+    </div>
+    <div class="step-divider"></div>
+    <div style="background:var(--teal-pale);border-radius:12px;padding:16px 20px;margin-bottom:20px;">
+      <div style="font-size:12px;font-weight:700;color:var(--teal);margin-bottom:6px;">💡 Savjet za cijene</div>
+      <div style="font-size:13px;color:var(--light);line-height:1.6;">Cijena za 1 miesec bi trebala biti ≈ 3× tjedna cijena kako bi nomadi imali motiv za duži boravak. Npr. €280/tjed → €840/mj.</div>
+    </div>
+    <div class="field">
+      <label>Što je uključeno u cijenu</label>
+      <div class="am-grid" id="includedGrid" style="margin-top:0;"></div>
+    </div>
+    <div class="field-row" style="margin-top:20px;">
+      <div class="field">
+        <label>Kaucija (opcija)</label>
+        <div class="price-input-wrap"><span class="currency">€</span><input type="number" id="fDeposit" placeholder="0"></div>
+      </div>
+      <div class="field">
+        <label>Naknada za čišćenje (opcija)</label>
+        <div class="price-input-wrap"><span class="currency">€</span><input type="number" id="fCleaning" placeholder="0"></div>
+      </div>
+    </div>
+    <!-- COLIVING ROOM PRICING -->
+    <div id="colivingPricing" style="display:none;">
+      <div class="step-divider"></div>
+      <div class="step-eyebrow">Cijene po sobama</div>
+      <div id="roomPriceList"></div>
+    </div>
+  </div>
+
+  <!-- STEP 6: DOSTUPNOST -->
+  <div class="step-page" id="step5">
+    <div class="step-eyebrow">Korak 6 od 7</div>
+    <h1 class="step-title">Kalendar<br><em>dostupnosti</em></h1>
+    <p class="step-sub">Označite zauzete dane. Slobodni dani bit će vidljivi nomadima u pretrazi. Možete ažurirati u svakom trenutku.</p>
+    <div class="avail-wrap" id="availCalWrap">
+      <div class="avail-hdr">
+        <div class="avail-month" id="availMonthLabel"></div>
+        <div class="avail-nav">
+          <button onclick="availNav(-1)">&#8249;</button>
+          <button onclick="availNav(1)">&#8250;</button>
+        </div>
+      </div>
+      <div class="avail-grid-wrap">
+        <div class="avail-days-hdr">
+          <div class="avail-day-lbl">P</div><div class="avail-day-lbl">U</div><div class="avail-day-lbl">S</div>
+          <div class="avail-day-lbl">Č</div><div class="avail-day-lbl">P</div><div class="avail-day-lbl">S</div><div class="avail-day-lbl">N</div>
+        </div>
+        <div class="avail-days" id="availDays"></div>
+      </div>
+      <div style="padding:0 14px 14px;font-size:12px;color:var(--muted);">Kliknite dan za blokiranje/oslobađanje. Crveno = zauzeto.</div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;">
+      <button class="bb-back" onclick="blockedDays=[];renderAvailCal()">Očisti sve</button>
+      <div style="padding:10px 16px;background:var(--gp);border:1px solid #BBF7D0;border-radius:9px;font-size:12px;color:var(--green);font-weight:600;">✓ Slobodni dani su automatski dostupni za upite</div>
+    </div>
+  </div>
+
+  <!-- STEP 7: PREGLED -->
+  <div class="step-page" id="step6">
+    <div class="step-eyebrow">Korak 7 od 7</div>
+    <h1 class="step-title">Pregled<br><em>i objava</em></h1>
+    <p class="step-sub">Provjerite sve podatke prije slanja na verifikaciju. Nakon odobrenja admin tima, oglas postaje vidljiv nomadima.</p>
+    <div class="review-grid" id="reviewGrid"></div>
+    <div style="margin-top:24px;padding:18px 20px;background:var(--teal-pale);border-radius:12px;border:1px solid var(--teal-pale2);">
+      <h4 style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:8px;">Što se događa po objavi?</h4>
+      <ol style="font-size:13px;color:var(--light);line-height:1.9;padding-left:18px;">
+        <li>Admin tim pregledava vaš oglas (obično unutar 24h)</li>
+        <li>Nakon odobrenja, oglas je odmah vidljiv svim nomadima</li>
+        <li>Primite email obavijest pri svakom upitu</li>
+        <li>Komunicirate direktno s nomadima bez provizije</li>
+      </ol>
+    </div>
+    <div style="margin-top:20px;">
+      <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:13px;color:var(--light);font-weight:400;letter-spacing:0;text-transform:none;">
+        <input type="checkbox" id="termsCheck" style="width:16px;height:16px;margin-top:2px;accent-color:var(--teal);">
+        Prihvaćam <a href="#" style="color:var(--teal);">uvjete korištenja</a> i potvrđujem da su svi podaci točni.
+      </label>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM BAR -->
+<div class="bottom-bar">
+  <div class="bb-left" id="bbStatus">Korak 1 od 7</div>
+  <div class="bb-right">
+    <button class="bb-back" id="bbBack" onclick="prevStep()" style="display:none;">← Nazad</button>
+    <button class="bb-next" id="bbNext" onclick="nextStep()">Dalje →</button>
+  </div>
+</div>
+
+<!-- SUCCESS OVERLAY -->
+<div id="successOverlay" style="display:none;position:fixed;inset:0;background:rgba(28,48,38,0.95);z-index:1000;display:none;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:20px;padding:52px;max-width:480px;text-align:center;">
+    <div style="font-size:52px;margin-bottom:20px;">🎉</div>
+    <h2 style="font-family:'Cormorant Garamond',serif;font-size:32px;color:var(--navy);margin-bottom:12px;">Oglas poslan!</h2>
+    <p style="font-size:14px;color:var(--light);line-height:1.7;margin-bottom:28px;">Vaš oglas je poslan na verifikaciju. Admin tim će ga pregledati i odobriti unutar 24 sata. Obavijest ćete dobiti emailom.</p>
+    <a href="owner-dashboard.html" style="display:inline-block;padding:13px 28px;background:var(--navy);color:#fff;border-radius:10px;font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;">Na dashboard →</a>
+  </div>
+</div>
+
+<script>
+let currentStep = 0;
+const totalSteps = 7;
+let listingType = '';
+let steppers = {beds:1,bath:1,guests:1,desks:1};
+let blockedDays = [];
+let availMonth = new Date().getMonth();
+let availYear = new Date().getFullYear();
+let rooms = [];
+let mainImages = [];
+
+// TYPE OPTIONS
+const TYPES = [
+  {id:'studio',icon:'🏢',label:'Studio',sub:'Jedna soba s kuhinjom'},
+  {id:'apartman',icon:'🏠',label:'Apartman',sub:'Zaseban stan'},
+  {id:'kuca',icon:'🏡',label:'Kuća',sub:'Cijela kuća'},
+  {id:'coliving',icon:'🤝',label:'Coliving',sub:'Više soba / zajednički prostori'},
+  {id:'penthouse',icon:'🌆',label:'Penthouse',sub:'Krovna etaža'},
+  {id:'soba',icon:'🛏️',label:'Privatna soba',sub:'Soba u stanu/kući'},
+];
+
+// AMENITIES
+const AMENITIES = [
+  {i:'🖥️',l:'Radni stol'},{i:'🪑',l:'Ergonomska stolica'},{i:'📺',l:'Vanjski monitor'},
+  {i:'🖨️',l:'Printer/Scanner'},{i:'❄️',l:'Klimatizacija'},{i:'🍳',l:'Kuhinja'},
+  {i:'🧺',l:'Perilica rublja'},{i:'🚗',l:'Parking'},{i:'🏊',l:'Plaža blizu'},
+  {i:'🏋️',l:'Fitness / Teretana'},{i:'☕',l:'Kava/čaj uključeni'},{i:'📦',l:'Primanje paketa'},
+  {i:'🔒',l:'Sef'},{i:'📡',l:'4G backup'},{i:'🌿',l:'Terasa/Balkon'},
+  {i:'🐶',l:'Pet friendly'},{i:'🛗',l:'Lift'},{i:'🔑',l:'Smart lock'},
+];
+
+const INCLUDED = [
+  {i:'💡',l:'Struja i voda'},{i:'🌐',l:'Internet'},{i:'🧹',l:'Tjedno čišćenje'},
+  {i:'📺',l:'Netflix/Streaming'},{i:'🛋️',l:'Posteljina i ručnici'},{i:'☕',l:'Kava i čaj'},
+];
+
+let selectedAmenities = new Set();
+let selectedIncluded = new Set();
+let wifiTier = '';
+
+// INIT
+document.addEventListener('DOMContentLoaded', () => {
+  renderTypes();
+  renderAmenities();
+  renderIncluded();
+  renderAvailCal();
+  updateStep();
+});
+
+function renderTypes(){
+  document.getElementById('typeGrid').innerHTML = TYPES.map(t=>`
+    <div class="type-card ${listingType===t.id?'selected':''}" id="tc-${t.id}" onclick="selectType('${t.id}')">
+      <div class="type-card-icon">${t.icon}</div>
+      <div class="type-card-label">${t.label}</div>
+      <div class="type-card-sub">${t.sub}</div>
+    </div>`).join('');
+}
+
+function selectType(id){
+  listingType=id;
+  renderTypes();
+  if(id==='coliving'){
+    document.getElementById('colivingRooms').style.display='block';
+    document.getElementById('roomPhotosSection').style.display='block';
+    document.getElementById('colivingPricing').style.display='block';
+    if(!rooms.length) addRoom();
+  } else {
+    document.getElementById('colivingRooms').style.display='none';
+    document.getElementById('roomPhotosSection').style.display='none';
+    document.getElementById('colivingPricing').style.display='none';
+  }
+}
+
+function renderAmenities(){
+  document.getElementById('amenitiesGrid').innerHTML = AMENITIES.map(a=>`
+    <div class="am-item ${selectedAmenities.has(a.l)?'on':''}" onclick="toggleAm('${a.l}','amenitiesGrid','am')">
+      <div class="am-icon">${a.i}</div>
+      <div class="am-label">${a.l}</div>
+    </div>`).join('');
+}
+
+function renderIncluded(){
+  document.getElementById('includedGrid').innerHTML = INCLUDED.map(a=>`
+    <div class="am-item ${selectedIncluded.has(a.l)?'on':''}" onclick="toggleIncluded('${a.l}')">
+      <div class="am-icon">${a.i}</div>
+      <div class="am-label">${a.l}</div>
+    </div>`).join('');
+}
+
+function toggleAm(label,gridId,type){
+  if(type==='am'){
+    if(selectedAmenities.has(label)) selectedAmenities.delete(label);
+    else selectedAmenities.add(label);
+    renderAmenities();
+  }
+}
+function toggleIncluded(label){
+  if(selectedIncluded.has(label)) selectedIncluded.delete(label);
+  else selectedIncluded.add(label);
+  renderIncluded();
+}
+
+function selectWifiTier(tier, defaultMbps){
+  wifiTier = tier;
+  document.querySelectorAll('.wifi-tier').forEach(el=>{el.classList.remove('selected');});
+  document.getElementById('wt-'+tier).classList.add('selected');
+  if(!document.getElementById('fWifiDown').value) document.getElementById('fWifiDown').value = defaultMbps;
+}
+
+// STEPPERS
+function adj(field, delta){
+  steppers[field] = Math.max(field==='beds'?0:1, steppers[field]+delta);
+  document.getElementById(field+'Val').textContent = steppers[field];
+  if(field==='beds'){document.getElementById('bedsM').disabled=steppers[field]<=0;}
+  if(field==='bath'){document.getElementById('bathM').disabled=steppers[field]<=1;}
+  if(field==='guests'){document.getElementById('guestsM').disabled=steppers[field]<=1;}
+  if(field==='desks'){document.getElementById('desksM').disabled=steppers[field]<=0;}
+}
+
+// ROOMS
+function addRoom(){
+  const idx = rooms.length;
+  rooms.push({name:`Soba ${idx+1}`,type:'Privatna soba',size:'',weekPrice:'',monthPrice:'',bed:'Bračni krevet'});
+  renderRoomsList();
+}
+
+function renderRoomsList(){
+  const list = document.getElementById('roomsList');
+  list.innerHTML = rooms.map((r,i)=>`
+    <div class="room-builder">
+      <div class="room-builder-hdr">
+        <div class="room-builder-title">🛏️ ${r.name}</div>
+        ${rooms.length>1?`<button class="bb-back" onclick="removeRoom(${i})" style="padding:5px 12px;font-size:11px;">Ukloni</button>`:''}
+      </div>
+      <div class="room-fields">
+        <div class="field-row">
+          <div class="field"><label>Naziv sobe</label><input type="text" value="${r.name}" onchange="rooms[${i}].name=this.value;document.querySelector('#roomsList .room-builder:nth-child(${i+1}) .room-builder-title').textContent='🛏️ '+this.value"></div>
+          <div class="field"><label>Tip sobe</label><select onchange="rooms[${i}].type=this.value"><option>Privatna soba</option><option>Zajednička soba</option><option>Mini studio</option><option>Suite</option></select></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Veličina (m²)</label><input type="number" placeholder="npr. 18" onchange="rooms[${i}].size=this.value"></div>
+          <div class="field"><label>Krevet</label><select onchange="rooms[${i}].bed=this.value"><option>Bračni krevet</option><option>Jednostruki krevet</option><option>2 × Jednostruki</option><option>Kauč + krevet</option></select></div>
+        </div>
+      </div>
+    </div>`).join('');
+  renderRoomPhotos();
+  renderRoomPrices();
+}
+
+function removeRoom(i){ rooms.splice(i,1); renderRoomsList(); }
+
+function renderRoomPhotos(){
+  const sec = document.getElementById('roomPhotosList');
+  sec.innerHTML = rooms.map((r,i)=>`
+    <div style="margin-bottom:16px;">
+      <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px;">${r.name}</div>
+      <div class="dropzone" onclick="document.getElementById('rf${i}').click()" style="padding:20px;">
+        <input type="file" id="rf${i}" multiple accept="image/*" onchange="handleRoomFiles(${i},this.files)">
+        <div style="font-size:13px;font-weight:600;color:var(--navy);">Dodaj fotografije za ovu sobu</div>
+        <div style="font-size:11px;color:var(--muted);">Min. 2 fotografije preporučeno</div>
+      </div>
+      <div class="img-grid" id="rfGrid${i}"></div>
+    </div>`).join('');
+}
+
+function handleRoomFiles(roomIdx, files){
+  const grid = document.getElementById('rfGrid'+roomIdx);
+  Array.from(files).forEach(f=>{
+    const url = URL.createObjectURL(f);
+    const div = document.createElement('div');
+    div.className = 'img-card';
+    div.innerHTML = `<img src="${url}"><button class="img-del" onclick="this.parentElement.remove()">×</button>`;
+    grid.appendChild(div);
+  });
+}
+
+function renderRoomPrices(){
+  const list = document.getElementById('roomPriceList');
+  list.innerHTML = rooms.map((r,i)=>`
+    <div class="room-builder">
+      <div class="room-builder-title" style="margin-bottom:12px;">💶 Cijene — ${r.name}</div>
+      <div class="field-row">
+        <div class="field"><label>Tjedna cijena</label><div class="price-input-wrap"><span class="currency">€</span><input type="number" placeholder="0" min="50" onchange="rooms[${i}].weekPrice=this.value"><span class="unit">/ tjed.</span></div></div>
+        <div class="field"><label>Miesečna cijena</label><div class="price-input-wrap"><span class="currency">€</span><input type="number" placeholder="0" min="100" onchange="rooms[${i}].monthPrice=this.value"><span class="unit">/ mj.</span></div></div>
+      </div>
+    </div>`).join('');
+}
+
+// IMAGES
+function handleFiles(files, section){
+  Array.from(files).forEach((f,i)=>{
+    const url = URL.createObjectURL(f);
+    mainImages.push(url);
+    const grid = document.getElementById('mainImgGrid');
+    const div = document.createElement('div');
+    div.className = 'img-card';
+    div.innerHTML = `<img src="${url}">${mainImages.length===1?'<div class="img-badge">Naslovnica</div>':''}<button class="img-del" onclick="this.parentElement.remove()">×</button>`;
+    grid.appendChild(div);
+  });
+}
+
+function handleDrop(ev, section){
+  ev.preventDefault();
+  document.getElementById('mainDropzone').classList.remove('drag');
+  handleFiles(ev.dataTransfer.files, section);
+}
+
+// PRICING TABS
+function switchPricingTab(mode, btn){
+  document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('pricingWeekly').style.display = (mode==='weekly'||mode==='both')?'block':'none';
+  document.getElementById('pricingMonthly').style.display = (mode==='monthly'||mode==='both')?'block':'none';
+}
+
+// AVAILABILITY CALENDAR
+function renderAvailCal(){
+  const months=['Siječanj','Veljača','Ožujak','Travanj','Svibanj','Lipanj','Srpanj','Kolovoz','Rujan','Listopad','Studeni','Prosinac'];
+  document.getElementById('availMonthLabel').textContent=`${months[availMonth]} ${availYear}`;
+  const today=new Date();
+  const firstDay=new Date(availYear,availMonth,1);
+  let startDow=firstDay.getDay();if(startDow===0)startDow=7;
+  const totalDays=new Date(availYear,availMonth+1,0).getDate();
+  const days=document.getElementById('availDays');
+  days.innerHTML='';
+  for(let i=1;i<startDow;i++) days.innerHTML+=`<div class="avail-day empty"></div>`;
+  for(let d=1;d<=totalDays;d++){
+    const date=new Date(availYear,availMonth,d);
+    const isPast=date<new Date(today.getFullYear(),today.getMonth(),today.getDate());
+    const isBlocked=blockedDays.some(b=>b.d===d&&b.m===availMonth&&b.y===availYear);
+    const isToday=d===today.getDate()&&availMonth===today.getMonth()&&availYear===today.getFullYear();
+    let cls=`avail-day `;
+    if(isPast)cls+='past';else if(isBlocked)cls+='blocked';else cls+='open';
+    if(isToday)cls+=' today';
+    days.innerHTML+=`<div class="${cls}" onclick="${isPast?'':`toggleAvailDay(${d},${availMonth},${availYear})`}">${d}</div>`;
+  }
+}
+function availNav(dir){availMonth+=dir;if(availMonth>11){availMonth=0;availYear++;}if(availMonth<0){availMonth=11;availYear--;}renderAvailCal();}
+function toggleAvailDay(d,m,y){const idx=blockedDays.findIndex(b=>b.d===d&&b.m===m&&b.y===y);if(idx>-1)blockedDays.splice(idx,1);else blockedDays.push({d,m,y});renderAvailCal();}
+
+// NAVIGATION
+function nextStep(){
+  if(currentStep<totalSteps-1){
+    if(currentStep===0&&!listingType){alert('Odaberite tip smještaja.'); return;}
+    if(currentStep===0&&!document.getElementById('fTitle').value.trim()){alert('Unesite naziv oglasa.'); return;}
+    if(currentStep===0&&!document.getElementById('fCity').value){alert('Odaberite grad.'); return;}
+    currentStep++;
+    updateStep();
+  } else {
+    if(!document.getElementById('termsCheck').checked){alert('Prihvatite uvjete korištenja.'); return;}
+    submitListing();
+  }
+}
+function prevStep(){if(currentStep>0){currentStep--;updateStep();}}
+
+function goToStep(idx){
+  if(idx<=currentStep) { currentStep=idx; updateStep(); }
+}
+
+function updateStep(){
+  document.querySelectorAll('.step-page').forEach((p,i)=>p.classList.toggle('active',i===currentStep));
+  document.querySelectorAll('.step-indicator').forEach((si,i)=>{
+    si.classList.remove('active','done');
+    if(i===currentStep) si.classList.add('active');
+    else if(i<currentStep) si.classList.add('done');
+  });
+  const pct = Math.round(((currentStep+1)/totalSteps)*100);
+  document.getElementById('progressFill').style.width=pct+'%';
+  document.getElementById('bbStatus').textContent=`Korak ${currentStep+1} od ${totalSteps}`;
+  document.getElementById('bbBack').style.display=currentStep>0?'':'none';
+  document.getElementById('bbNext').textContent=currentStep===totalSteps-1?'Objavi oglas ✓':'Dalje →';
+  if(currentStep===totalSteps-1) renderReview();
+  window.scrollTo(0,0);
+  simulateAutosave();
+}
+
+function renderReview(){
+  const title=document.getElementById('fTitle').value||'—';
+  const city=document.getElementById('fCity').value||'—';
+  const area=document.getElementById('fArea').value||'—';
+  const wifiDown=document.getElementById('fWifiDown').value||'—';
+  const wifiUp=document.getElementById('fWifiUp').value||'—';
+  const weekPrice=document.getElementById('fWeekPrice').value;
+  const monthPrice=document.getElementById('fMonthPrice').value;
+  document.getElementById('reviewGrid').innerHTML=`
+    <div class="review-block">
+      <div class="review-block-title">Osnovni podaci</div>
+      <div class="review-row"><span class="review-key">Tip</span><span class="review-val">${TYPES.find(t=>t.id===listingType)?.label||'—'}</span></div>
+      <div class="review-row"><span class="review-key">Naziv</span><span class="review-val">${title}</span></div>
+      <div class="review-row"><span class="review-key">Grad</span><span class="review-val">${city}</span></div>
+      <div class="review-row"><span class="review-key">Kvart</span><span class="review-val">${area}</span></div>
+      <div class="review-row"><span class="review-key">Spavaće sobe</span><span class="review-val">${steppers.beds}</span></div>
+      <div class="review-row"><span class="review-key">Kupaone</span><span class="review-val">${steppers.bath}</span></div>
+      <div class="review-row"><span class="review-key">Gostiju max.</span><span class="review-val">${steppers.guests}</span></div>
+      <div class="review-row"><span class="review-key">Radna mjesta</span><span class="review-val">${steppers.desks}</span></div>
+    </div>
+    <div class="review-block">
+      <div class="review-block-title">Internet & Cijene</div>
+      <div class="review-row"><span class="review-key">WiFi Download</span><span class="review-val">${wifiDown} Mbps</span></div>
+      <div class="review-row"><span class="review-key">WiFi Upload</span><span class="review-val">${wifiUp} Mbps</span></div>
+      <div class="review-row"><span class="review-key">Tjedna cijena</span><span class="review-val">${weekPrice?'€'+weekPrice:'—'}</span></div>
+      <div class="review-row"><span class="review-key">Miesečna cijena</span><span class="review-val">${monthPrice?'€'+monthPrice:'—'}</span></div>
+      <div class="review-row"><span class="review-key">Sadržaji</span><span class="review-val">${selectedAmenities.size} odabrano</span></div>
+      <div class="review-row"><span class="review-key">Sobe (coliving)</span><span class="review-val">${listingType==='coliving'?rooms.length+' soba':'N/A'}</span></div>
+      <div class="review-row"><span class="review-key">Blokirani dani</span><span class="review-val">${blockedDays.length} dana</span></div>
+    </div>`;
+}
+
+function submitListing(){
+  document.getElementById('successOverlay').style.display='flex';
+}
+
+function updateChar(inputId, countId, max){
+  const val = document.getElementById(inputId).value.length;
+  document.getElementById(countId).textContent = val;
+}
+
+let saveTimer = null;
+function simulateAutosave(){
+  document.getElementById('autosaveStatus').textContent='Sprema…';
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(()=>{ document.getElementById('autosaveStatus').textContent='Automatski spremljeno'; },1200);
+}
+</script>
+</body>
+</html>

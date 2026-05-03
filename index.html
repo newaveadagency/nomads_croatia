@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nomads Croatia – Smještaj za digitalne nomade u Hrvatskoj</title>
+<meta name="description" content="Pronađi savršen smještaj za duži boravak u Hrvatskoj. Tjedni i mjesečni najam, verificirani WiFi, coworking, coliving prostori.">
+<link rel="preconnect" href="https://res.cloudinary.com" crossorigin>
+<link rel="preload" href="/fonts/jost-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jost-latin-ext.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/cormorant-normal-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/cormorant-normal-latin-ext.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/cormorant-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/cormorant-italic-latin-ext.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:'Jost';font-style:normal;font-weight:200 600;font-display:swap;src:url('/fonts/jost-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;}
+@font-face{font-family:'Jost';font-style:normal;font-weight:200 600;font-display:swap;src:url('/fonts/jost-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;}
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:300 500;font-display:swap;src:url('/fonts/cormorant-normal-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;}
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:300 500;font-display:swap;src:url('/fonts/cormorant-normal-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;}
+@font-face{font-family:'Cormorant Garamond';font-style:italic;font-weight:300 400;font-display:swap;src:url('/fonts/cormorant-italic-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;}
+@font-face{font-family:'Cormorant Garamond';font-style:italic;font-weight:300 400;font-display:swap;src:url('/fonts/cormorant-italic-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;}
+</style>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --navy:#1C3026;
+  --teal:#2A6049;
+  --teal-mid:#357A5C;
+  --teal-pale:#DFF0E8;
+  --teal-pale2:#BDD8CA;
+  --accent:#F59E0B;
+  --accent-pale:#FEF3C7;
+  --white:#fff;
+  --off:#F8FBF9;
+  --cream:#F3F7F4;
+  --border:#D8E8DD;
+  --text:#0D1E28;
+  --text-light:#3E5F4C;
+  --text-muted:#6D9B7E;
+  --green:#16A34A;
+  --green-pale:#DCFCE7;
+  --orange:#EA580C;
+  --orange-pale:#FFF7ED;
+  --shadow:0 2px 16px rgba(28,48,38,0.07);
+  --shadow-md:0 6px 32px rgba(28,48,38,0.11);
+  --shadow-lg:0 16px 56px rgba(28,48,38,0.15);
+}
+html{scroll-behavior:smooth;font-size:16px;}
+body{font-family:'Jost',sans-serif;background:#fff;color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+img{max-width:100%;height:auto;display:block;}
+a{text-decoration:none;color:inherit;}
+button{cursor:pointer;font-family:'Jost',sans-serif;}
+
+/* NAV */
+.nav{position:sticky;top:0;left:0;right:0;z-index:200;height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 48px;background:#fff;border-bottom:1px solid var(--border);box-shadow:var(--shadow);}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.nav-logo-icon{width:36px;height:36px;background:var(--navy);border-radius:9px;display:flex;align-items:center;justify-content:center;}
+.nav-logo-icon svg{width:20px;height:20px;fill:#fff;}
+.nav-logo-text{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;color:var(--navy);letter-spacing:0.03em;}
+.nav-logo-sub{font-family:'Jost',sans-serif;font-size:8px;font-weight:600;letter-spacing:0.25em;text-transform:uppercase;color:var(--text-muted);margin-top:-2px;}
+.nav-links{display:flex;align-items:center;gap:32px;}
+.nav-link{font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-light);transition:color 0.2s;text-decoration:none;}
+.nav-link:hover,.nav-link.active{color:var(--navy);}
+.nav-right{display:flex;align-items:center;gap:12px;}
+.nav-owner{font-size:11px;font-weight:500;letter-spacing:0.05em;color:var(--text-light);transition:color 0.2s;}
+.nav-owner:hover{color:var(--navy);}
+.nav-cta{padding:9px 20px;background:var(--navy);border:none;border-radius:9px;color:#fff;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;transition:background 0.2s;text-decoration:none;display:inline-flex;align-items:center;}
+.nav-cta:hover{background:var(--teal);}
+.ham{display:none;flex-direction:column;gap:5px;background:none;border:none;padding:8px;cursor:pointer;}
+.ham span{display:block;width:22px;height:1.5px;background:var(--navy);border-radius:2px;transition:all 0.3s;}
+
+/* HERO */
+.hero{min-height:88vh;display:flex;align-items:center;position:relative;overflow:hidden;background:linear-gradient(135deg,var(--navy) 0%,#1E4030 50%,#2D6649 100%);}
+.hero-bg{position:absolute;inset:0;background:url('https://images.unsplash.com/photo-1555990793-da11153b2473?w=1600&q=80') center/cover no-repeat;opacity:0.18;}
+.hero-content{position:relative;z-index:1;width:100%;max-width:1200px;margin:0 auto;padding:80px 48px;}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:100px;padding:6px 16px;margin-bottom:28px;}
+.hero-eyebrow-dot{width:7px;height:7px;border-radius:50%;background:#22C55E;box-shadow:0 0 6px #22C55E;}
+.hero-eyebrow-text{font-size:11px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.85);}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(44px,6vw,76px);font-weight:400;color:#fff;line-height:1.1;margin-bottom:20px;}
+.hero-title em{font-style:italic;color:#A7F3D0;}
+.hero-sub{font-size:17px;color:rgba(255,255,255,0.7);line-height:1.65;max-width:520px;margin-bottom:48px;font-weight:300;}
+
+/* SEARCH BOX */
+.search-box{background:#fff;border-radius:18px;padding:10px;box-shadow:var(--shadow-lg);display:flex;align-items:stretch;gap:0;max-width:860px;border:1px solid rgba(255,255,255,0.1);}
+.search-field{flex:1;padding:10px 18px;display:flex;flex-direction:column;gap:3px;border-right:1px solid var(--border);cursor:pointer;}
+.search-field:last-of-type{border-right:none;}
+.search-field-label{font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);}
+.search-field-val{font-size:14px;color:var(--text);font-weight:400;}
+.search-field-val.placeholder{color:var(--text-muted);}
+.search-btn{padding:14px 28px;background:var(--teal);border:none;border-radius:12px;color:#fff;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;display:flex;align-items:center;gap:8px;flex-shrink:0;transition:background 0.2s;text-decoration:none;}
+.search-btn:hover{background:var(--navy);}
+.search-btn svg{width:16px;height:16px;fill:#fff;}
+.search-tags{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;}
+.search-tag{display:flex;align-items:center;gap:6px;padding:7px 14px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:100px;color:rgba(255,255,255,0.8);font-size:11px;font-weight:500;cursor:pointer;transition:all 0.2s;}
+.search-tag:hover{background:rgba(255,255,255,0.18);}
+.search-tag svg{width:12px;height:12px;fill:rgba(255,255,255,0.6);}
+
+/* STATS BAR */
+.stats-bar{background:var(--navy);padding:18px 48px;}
+.stats-bar-inner{max-width:1200px;margin:0 auto;display:flex;gap:0;justify-content:center;}
+.stat-item{flex:1;text-align:center;padding:8px 24px;border-right:1px solid rgba(255,255,255,0.08);}
+.stat-item:last-child{border-right:none;}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;color:#fff;line-height:1;}
+.stat-lbl{font-size:11px;color:rgba(255,255,255,0.4);letter-spacing:0.05em;margin-top:2px;}
+
+/* SECTION */
+.sec{padding:80px 48px;}
+.sec-inner{max-width:1200px;margin:0 auto;}
+.sec-header{margin-bottom:44px;}
+.sec-eyebrow{font-size:11px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:var(--teal);margin-bottom:12px;}
+.sec-title{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,4vw,48px);font-weight:400;color:var(--navy);line-height:1.2;}
+.sec-title em{font-style:italic;color:var(--teal);}
+.sec-sub{font-size:15px;color:var(--text-light);line-height:1.65;max-width:520px;margin-top:12px;}
+
+/* LOCATIONS GRID */
+.locations-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.loc-card{position:relative;border-radius:16px;overflow:hidden;aspect-ratio:4/3;cursor:pointer;text-decoration:none;}
+.loc-card:hover .loc-img{transform:scale(1.06);}
+.loc-card.large{grid-row:span 2;aspect-ratio:auto;}
+.loc-img{width:100%;height:100%;object-fit:cover;transition:transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94);}
+.loc-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(28,48,38,0.75) 0%,rgba(28,48,38,0.1) 60%);}
+.loc-info{position:absolute;bottom:0;left:0;right:0;padding:20px;}
+.loc-name{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:400;color:#fff;}
+.loc-count{font-size:11px;color:rgba(255,255,255,0.65);margin-top:2px;letter-spacing:0.05em;}
+.loc-wifi{display:inline-flex;align-items:center;gap:5px;margin-top:8px;background:rgba(22,163,74,0.25);border:1px solid rgba(22,163,74,0.4);border-radius:100px;padding:3px 10px;}
+.loc-wifi-dot{width:6px;height:6px;border-radius:50%;background:#22C55E;}
+.loc-wifi-text{font-size:10px;font-weight:600;color:#86EFAC;}
+
+/* LISTING CARDS */
+.listings-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+.listing-card{border-radius:16px;overflow:hidden;border:1px solid var(--border);background:#fff;transition:box-shadow 0.25s,transform 0.25s;text-decoration:none;color:inherit;display:block;}
+.listing-card:hover{box-shadow:var(--shadow-md);transform:translateY(-3px);}
+.listing-card-img{position:relative;aspect-ratio:4/3;overflow:hidden;background:var(--teal-pale);}
+.listing-card-img img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s;}
+.listing-card:hover .listing-card-img img{transform:scale(1.05);}
+.listing-badge{position:absolute;top:12px;left:12px;display:flex;gap:6px;}
+.badge-type{background:rgba(28,48,38,0.85);color:#fff;font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:4px 9px;border-radius:6px;backdrop-filter:blur(4px);}
+.badge-wifi{display:flex;align-items:center;gap:4px;border-radius:6px;padding:4px 9px;font-size:9px;font-weight:700;letter-spacing:0.06em;}
+.badge-wifi.fast{background:rgba(22,163,74,0.9);color:#fff;}
+.badge-wifi.mid{background:rgba(245,158,11,0.9);color:#fff;}
+.badge-wifi.slow{background:rgba(239,68,68,0.9);color:#fff;}
+.listing-card-body{padding:16px;}
+.listing-card-loc{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted);margin-bottom:6px;}
+.listing-card-loc svg{width:11px;height:11px;fill:var(--text-muted);}
+.listing-card-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:400;color:var(--navy);line-height:1.3;margin-bottom:10px;}
+.listing-card-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.tag{font-size:10px;font-weight:600;letter-spacing:0.06em;padding:4px 9px;border-radius:6px;background:var(--teal-pale);color:var(--teal);}
+.tag.accent{background:var(--accent-pale);color:#B45309;}
+.listing-card-price{display:flex;align-items:baseline;gap:6px;border-top:1px solid var(--border);padding-top:12px;margin-top:4px;}
+.price-main{font-size:19px;font-weight:600;color:var(--navy);}
+.price-per{font-size:12px;color:var(--text-muted);}
+.price-month{font-size:12px;color:var(--text-light);margin-left:auto;}
+
+/* FEATURES */
+.features-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;}
+.feature-card{background:var(--off);border-radius:16px;padding:28px 24px;border:1px solid var(--border);}
+.feature-icon{width:48px;height:48px;border-radius:12px;background:var(--teal-pale);display:flex;align-items:center;justify-content:center;margin-bottom:18px;}
+.feature-icon svg{width:24px;height:24px;fill:var(--teal);}
+.feature-title{font-size:15px;font-weight:600;color:var(--navy);margin-bottom:8px;}
+.feature-text{font-size:13px;color:var(--text-light);line-height:1.6;}
+
+/* WIFI EXPLAINER */
+.wifi-section{background:var(--navy);padding:72px 48px;position:relative;overflow:hidden;}
+.wifi-section::before{content:'';position:absolute;right:-100px;top:-100px;width:500px;height:500px;border-radius:50%;background:rgba(53,122,92,0.08);}
+.wifi-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;}
+.wifi-text .sec-eyebrow{color:#A7F3D0;}
+.wifi-text .sec-title{color:#fff;}
+.wifi-text .sec-title em{color:#A7F3D0;}
+.wifi-text .sec-sub{color:rgba(255,255,255,0.6);}
+.wifi-tiers{display:flex;flex-direction:column;gap:14px;}
+.wifi-tier{display:flex;align-items:center;gap:16px;padding:16px 20px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);}
+.wifi-tier-badge{width:48px;height:48px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;}
+.wifi-tier-badge.fast{background:rgba(22,163,74,0.2);border:1px solid rgba(22,163,74,0.3);}
+.wifi-tier-badge.mid{background:rgba(245,158,11,0.2);border:1px solid rgba(245,158,11,0.3);}
+.wifi-tier-badge.slow{background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.3);}
+.wifi-tier-icon{font-size:20px;}
+.wifi-tier-mbps{font-size:9px;font-weight:700;letter-spacing:0.05em;color:rgba(255,255,255,0.5);}
+.wifi-tier.fast .wifi-tier-mbps{color:#86EFAC;}
+.wifi-tier.mid .wifi-tier-mbps{color:#FDE68A;}
+.wifi-tier.slow .wifi-tier-mbps{color:#FCA5A5;}
+.wifi-tier-info h4{font-size:14px;font-weight:600;color:#fff;margin-bottom:2px;}
+.wifi-tier-info p{font-size:12px;color:rgba(255,255,255,0.5);line-height:1.5;}
+
+/* HOW IT WORKS */
+.how-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative;}
+.how-steps::before{content:'';position:absolute;top:28px;left:14%;right:14%;height:1px;background:var(--border);z-index:0;}
+.how-step{text-align:center;padding:0 16px;position:relative;z-index:1;}
+.how-num{width:56px;height:56px;border-radius:50%;background:#fff;border:2px solid var(--teal);color:var(--teal);font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
+.how-title{font-size:15px;font-weight:600;color:var(--navy);margin-bottom:8px;}
+.how-text{font-size:13px;color:var(--text-light);line-height:1.6;}
+
+/* CTA BANNER */
+.cta-banner{background:linear-gradient(135deg,#1C3026,#2A6049);border-radius:24px;padding:60px 56px;display:flex;align-items:center;justify-content:space-between;gap:40px;}
+.cta-text .sec-title{color:#fff;font-size:36px;}
+.cta-text .sec-title em{color:#A7F3D0;}
+.cta-text .sec-sub{color:rgba(255,255,255,0.65);margin-top:12px;}
+.cta-actions{display:flex;gap:12px;flex-shrink:0;}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:11px;font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;transition:all 0.2s;cursor:pointer;border:none;text-decoration:none;}
+.btn-white{background:#fff;color:var(--navy);}
+.btn-white:hover{background:var(--teal-pale);}
+.btn-outline-white{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,0.35);}
+.btn-outline-white:hover{background:rgba(255,255,255,0.1);}
+.btn svg{width:14px;height:14px;}
+.btn-white svg{fill:var(--navy);}
+.btn-outline-white svg{fill:#fff;}
+
+/* FOOTER */
+.footer{background:var(--navy);color:#fff;padding:60px 48px 32px;}
+.footer-inner{max-width:1200px;margin:0 auto;}
+.footer-top{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:48px;padding-bottom:48px;border-bottom:1px solid rgba(255,255,255,0.07);}
+.footer-brand .nav-logo-text{color:#fff;}
+.footer-brand p{font-size:13px;color:rgba(255,255,255,0.4);line-height:1.7;margin-top:14px;max-width:240px;}
+.footer-col h5{font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:16px;}
+.footer-links{display:flex;flex-direction:column;gap:10px;}
+.footer-links a{font-size:13px;color:rgba(255,255,255,0.5);transition:color 0.2s;text-decoration:none;}
+.footer-links a:hover{color:#fff;}
+.footer-bottom{display:flex;align-items:center;justify-content:space-between;padding-top:28px;}
+.footer-copy{font-size:12px;color:rgba(255,255,255,0.25);}
+.footer-legal{display:flex;gap:20px;}
+.footer-legal a{font-size:12px;color:rgba(255,255,255,0.25);text-decoration:none;}
+.footer-legal a:hover{color:rgba(255,255,255,0.6);}
+
+/* MOBILE DRAWER */
+.mob-drawer{position:fixed;top:0;left:0;right:0;bottom:0;background:var(--navy);z-index:999;transform:translateX(-100%);transition:transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94);display:flex;flex-direction:column;padding:80px 40px 44px;}
+.mob-drawer.open{transform:translateX(0);}
+.mob-close{position:absolute;top:24px;right:28px;background:none;border:none;cursor:pointer;color:#fff;font-size:24px;}
+.mob-link{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;color:rgba(255,255,255,0.85);padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.07);display:block;}
+.mob-link:hover{color:#fff;}
+.mob-actions{margin-top:32px;display:flex;flex-direction:column;gap:10px;}
+.mob-btn{padding:13px 20px;border-radius:10px;font-size:12px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;border:none;text-align:center;text-decoration:none;}
+.mob-btn-solid{background:#fff;color:var(--navy);}
+.mob-btn-ghost{background:none;border:1px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.8);}
+
+@media(max-width:1024px){
+  .features-grid{grid-template-columns:repeat(2,1fr);}
+  .footer-top{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:768px){
+  .nav{padding:0 20px;}
+  .nav-links,.nav-owner{display:none;}
+  .nav-cta{display:none;}
+  .ham{display:flex;}
+  .hero-content{padding:60px 20px;}
+  .search-box{flex-direction:column;gap:2px;padding:8px;}
+  .search-field{border-right:none;border-bottom:1px solid var(--border);padding:12px 14px;}
+  .search-field:last-of-type{border-bottom:none;}
+  .stats-bar{padding:16px 20px;}
+  .stats-bar-inner{gap:0;}
+  .stat-item{padding:6px 12px;}
+  .stat-num{font-size:22px;}
+  .sec{padding:56px 20px;}
+  .locations-grid{grid-template-columns:1fr 1fr;gap:12px;}
+  .loc-card.large{grid-row:auto;}
+  .listings-grid{grid-template-columns:1fr;}
+  .features-grid{grid-template-columns:1fr;}
+  .wifi-inner{grid-template-columns:1fr;gap:40px;}
+  .how-steps{grid-template-columns:1fr 1fr;gap:32px;}
+  .how-steps::before{display:none;}
+  .cta-banner{flex-direction:column;padding:40px 28px;}
+  .cta-actions{flex-direction:column;width:100%;}
+  .footer-top{grid-template-columns:1fr;gap:32px;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+    </div>
+    <div>
+      <div class="nav-logo-text">Nomads Croatia</div>
+      <div class="nav-logo-sub">Digital Nomad Stays</div>
+    </div>
+  </a>
+  <div class="nav-links">
+    <a href="smjestaj.html" class="nav-link">Smještaj</a>
+    <a href="#lokacije" class="nav-link">Lokacije</a>
+    <a href="#kako-funkcionira" class="nav-link">Kako funkcionira</a>
+  </div>
+  <div class="nav-right">
+    <a href="owner-dashboard.html" class="nav-owner">Za vlasnike</a>
+    <a href="owner-dashboard.html" class="nav-cta">Oglasi smještaj</a>
+  </div>
+  <button class="ham" id="hamBtn" aria-label="Izbornik">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- MOBILE DRAWER -->
+<div class="mob-drawer" id="mobDrawer">
+  <button class="mob-close" id="mobClose">✕</button>
+  <a href="smjestaj.html" class="mob-link">Smještaj</a>
+  <a href="#lokacije" class="mob-link">Lokacije</a>
+  <a href="#kako-funkcionira" class="mob-link">Kako funkcionira</a>
+  <div class="mob-actions">
+    <a href="owner-dashboard.html" class="mob-btn mob-btn-solid">Oglasi smještaj</a>
+    <a href="owner-dashboard.html" class="mob-btn mob-btn-ghost">Za vlasnike</a>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">
+      <span class="hero-eyebrow-dot"></span>
+      <span class="hero-eyebrow-text">Hrvatska · Tjedni & Mjesečni najam</span>
+    </div>
+    <h1 class="hero-title">
+      Radi. Istraži.<br>
+      <em>Živi u Hrvatskoj.</em>
+    </h1>
+    <p class="hero-sub">Pronađi provjeren smještaj s brzim WiFi-em za digitalne nomade. Tjedni i mjesečni najam, bez provizije, direktno od vlasnika.</p>
+    <div class="search-box">
+      <div class="search-field" onclick="document.getElementById('locInput').focus()">
+        <div class="search-field-label">Lokacija</div>
+        <input id="locInput" type="text" placeholder="Split, Dubrovnik, Zagreb…" style="border:none;outline:none;font-family:'Jost',sans-serif;font-size:14px;color:#0D1E28;background:transparent;width:100%;padding:0;" />
+      </div>
+      <div class="search-field">
+        <div class="search-field-label">Dolazak</div>
+        <div class="search-field-val placeholder" id="dateIn">Odaberite datum</div>
+      </div>
+      <div class="search-field">
+        <div class="search-field-label">Trajanje</div>
+        <select id="durSelect" style="border:none;outline:none;font-family:'Jost',sans-serif;font-size:14px;color:#0D1E28;background:transparent;width:100%;padding:0;cursor:pointer;-webkit-appearance:none;">
+          <option value="">Odaberite…</option>
+          <option value="1w">1 tjedan</option>
+          <option value="2w">2 tjedna</option>
+          <option value="1m">1 mjesec</option>
+          <option value="2m">2 mjeseca</option>
+          <option value="3m">3 mjeseca</option>
+          <option value="6m">6 mjeseci</option>
+        </select>
+      </div>
+      <a href="smjestaj.html" class="search-btn">
+        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        Traži smještaj
+      </a>
+    </div>
+    <div class="search-tags">
+      <span class="search-tag">
+        <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        100+ Mbps WiFi
+      </span>
+      <span class="search-tag">
+        <svg viewBox="0 0 24 24"><path d="M20 6h-2.18c.07-.44.18-.88.18-1.33C18 2.53 16.48 1 14.67 1c-1.25 0-2.24.78-3 1.67C10.96 1.78 10.24 1 8.67 1 6.86 1 5.33 2.53 5.33 4.67c0 .45.11.89.18 1.33H3c-1.11 0-2 .89-2 2v13c0 1.11.89 2 2 2h18c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2z"/></svg>
+        Uključene režije
+      </span>
+      <span class="search-tag">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+        Fleksibilan odlazak
+      </span>
+      <span class="search-tag">
+        <svg viewBox="0 0 24 24"><path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/></svg>
+        Tjedni / Mjesečni
+      </span>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stats-bar-inner">
+    <div class="stat-item">
+      <div class="stat-num">340+</div>
+      <div class="stat-lbl">Verificiranih oglasa</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">18</div>
+      <div class="stat-lbl">Gradova u Hrvatskoj</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">94%</div>
+      <div class="stat-lbl">Oglasa s 50+ Mbps WiFi</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">0%</div>
+      <div class="stat-lbl">Provizija platforme</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">12</div>
+      <div class="stat-lbl">Coliving prostora</div>
+    </div>
+  </div>
+</div>
+
+<!-- LOCATIONS -->
+<section class="sec" id="lokacije">
+  <div class="sec-inner">
+    <div class="sec-header">
+      <div class="sec-eyebrow">Popularne destinacije</div>
+      <h2 class="sec-title">Pronađi savršenu<br><em>nomad bazu</em></h2>
+      <p class="sec-sub">Hrvatska nudi raznolikost — od živahnog Splita do mirnog Rovinja. Svaki grad prilagođen digitalnom nomadu.</p>
+    </div>
+    <div class="locations-grid" id="locGrid"></div>
+  </div>
+</section>
+
+<!-- FEATURED LISTINGS -->
+<section class="sec" style="background:var(--cream);">
+  <div class="sec-inner">
+    <div class="sec-header" style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:20px;">
+      <div>
+        <div class="sec-eyebrow">Istaknuti smještaji</div>
+        <h2 class="sec-title">Nomad ready<br><em>prostori</em></h2>
+      </div>
+      <a href="smjestaj.html" class="btn" style="background:var(--navy);color:#fff;">
+        Svi oglasi
+        <svg style="fill:#fff;" viewBox="0 0 24 24" width="14" height="14"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+      </a>
+    </div>
+    <div class="listings-grid" id="featuredGrid"></div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="sec">
+  <div class="sec-inner">
+    <div class="sec-header" style="text-align:center;max-width:600px;margin:0 auto 48px;">
+      <div class="sec-eyebrow">Zašto Nomads Croatia</div>
+      <h2 class="sec-title">Sve što nomad<br><em>treba</em></h2>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        </div>
+        <h3 class="feature-title">Verificiran WiFi</h3>
+        <p class="feature-text">Svaki oglas prikazuje stvarnu brzinu interneta izmjerenu u Mbps. Nema iznenađenja — znate što dobivate.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>
+        </div>
+        <h3 class="feature-title">Fleksibilni uvjeti</h3>
+        <p class="feature-text">Tjedni i mjesečni najam bez dugih ugovora. Dolazak i odlazak po dogovoru s vlasnikom.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+        </div>
+        <h3 class="feature-title">Verificirani vlasnici</h3>
+        <p class="feature-text">Svi vlasnici prolaze provjeru identiteta. Komunicirate direktno, bez posrednika i skrivenih naknada.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+        </div>
+        <h3 class="feature-title">Integriran kalendar</h3>
+        <p class="feature-text">Pregled dostupnosti u realnom vremenu. Planirajte boravak bez nepotrebnog dopisivanja.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WIFI EXPLAINER -->
+<section class="wifi-section">
+  <div class="wifi-inner">
+    <div class="wifi-text">
+      <div class="sec-eyebrow">Internet brzina</div>
+      <h2 class="sec-title">WiFi je naš<br><em>prioritet #1</em></h2>
+      <p class="sec-sub">Za digitalne nomade internet nije luksuz — to je alat za rad. Zato svaki oglas obavezno prikazuje izmjerenu brzinu u Mbps, down i upload.</p>
+      <div style="margin-top:28px;">
+        <a href="smjestaj.html?wifi=100" class="btn btn-white" style="margin-right:12px;">Traži 100+ Mbps</a>
+        <a href="smjestaj.html" class="btn btn-outline-white">Sve lokacije</a>
+      </div>
+    </div>
+    <div class="wifi-tiers">
+      <div class="wifi-tier fast">
+        <div class="wifi-tier-badge fast">
+          <span class="wifi-tier-icon">⚡</span>
+          <span class="wifi-tier-mbps">100+ Mbps</span>
+        </div>
+        <div class="wifi-tier-info">
+          <h4>Super brz — Nomad Pro</h4>
+          <p>Idealno za video pozive, streaming, upload velikih fajlova i rad u cloudu bez ograničenja.</p>
+        </div>
+      </div>
+      <div class="wifi-tier mid">
+        <div class="wifi-tier-badge mid">
+          <span class="wifi-tier-icon">📶</span>
+          <span class="wifi-tier-mbps">30–100 Mbps</span>
+        </div>
+        <div class="wifi-tier-info">
+          <h4>Solidan — Standard rada</h4>
+          <p>Dovoljno za većinu remote poslova, video pozive i streaming. Preporučeno za nomade.</p>
+        </div>
+      </div>
+      <div class="wifi-tier slow">
+        <div class="wifi-tier-badge slow">
+          <span class="wifi-tier-icon">⚠️</span>
+          <span class="wifi-tier-mbps">&lt; 30 Mbps</span>
+        </div>
+        <div class="wifi-tier-info">
+          <h4>Bazičan — Samo za surfanje</h4>
+          <p>Prikladno za email i lagani web. Nije preporučeno za video pozive ili heavy upload.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="sec" id="kako-funkcionira">
+  <div class="sec-inner">
+    <div class="sec-header" style="text-align:center;max-width:560px;margin:0 auto 60px;">
+      <div class="sec-eyebrow">Kako funkcionira</div>
+      <h2 class="sec-title">Jednostavno<br><em>od pretrage do ključeva</em></h2>
+    </div>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="how-num">1</div>
+        <h3 class="how-title">Odaberi lokaciju</h3>
+        <p class="how-text">Pretraži po gradu, WiFi brzini, tipu smještaja i trajanju boravka.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-num">2</div>
+        <h3 class="how-title">Provjeri oglas</h3>
+        <p class="how-text">Detaljne fotografije, tlocrt, stvarna WiFi brzina, kalendar dostupnosti.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-num">3</div>
+        <h3 class="how-title">Kontaktiraj vlasnika</h3>
+        <p class="how-text">Direktna komunikacija bez posrednika. Dogovorite uvjete i termin.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-num">4</div>
+        <h3 class="how-title">Uselit' se i raditi</h3>
+        <p class="how-text">Dođi s laptopom, uključi se i počni raditi. Hrvatska čeka.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<section class="sec" style="background:var(--cream);">
+  <div class="sec-inner">
+    <div class="cta-banner">
+      <div class="cta-text">
+        <div class="sec-eyebrow" style="color:#A7F3D0;">Za vlasnike smještaja</div>
+        <h2 class="sec-title">Iznajmite nomadima.<br><em>Stabilni prihod.</em></h2>
+        <p class="sec-sub">Objavite oglas besplatno. Digitalni nomadi traže duže boravke — tjedni i mjesečni najam donosi stabilniji prihod nego kratki turistički boravci.</p>
+      </div>
+      <div class="cta-actions">
+        <a href="dodaj-oglas.html" class="btn btn-white">
+          <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+          Dodaj oglas besplatno
+        </a>
+        <a href="owner-dashboard.html" class="btn btn-outline-white">
+          Owner dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="nav-logo-text" style="font-family:'Cormorant Garamond',serif;font-size:22px;color:#fff;">Nomads Croatia</div>
+        <p>Platforma za digitalne nomade koji žele živjeti i raditi iz Hrvatske. Tjedni i mjesečni najam, verificirani smještaji.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Smještaj</h5>
+        <div class="footer-links">
+          <a href="smjestaj.html">Svi oglasi</a>
+          <a href="smjestaj.html?type=coliving">Coliving prostori</a>
+          <a href="smjestaj.html?wifi=100">100+ Mbps WiFi</a>
+          <a href="smjestaj.html?duration=monthly">Mjesečni najam</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h5>Lokacije</h5>
+        <div class="footer-links">
+          <a href="smjestaj.html?loc=split">Split</a>
+          <a href="smjestaj.html?loc=dubrovnik">Dubrovnik</a>
+          <a href="smjestaj.html?loc=zagreb">Zagreb</a>
+          <a href="smjestaj.html?loc=rovinj">Rovinj</a>
+          <a href="smjestaj.html?loc=zadar">Zadar</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h5>Za vlasnike</h5>
+        <div class="footer-links">
+          <a href="dodaj-oglas.html">Dodaj oglas</a>
+          <a href="owner-dashboard.html">Owner dashboard</a>
+          <a href="#">Cijene & paketi</a>
+          <a href="#">Podrška</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2025 Nomads Croatia. Sva prava pridržana.</div>
+      <div class="footer-legal">
+        <a href="#">Uvjeti korištenja</a>
+        <a href="#">Privatnost</a>
+        <a href="#">Kolačići</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// DATA
+const locations = [
+  {name:'Split',count:87,wifi:'100 Mbps avg',img:'https://images.unsplash.com/photo-1555990793-da11153b2473?w=800&q=80',large:true},
+  {name:'Dubrovnik',count:54,wifi:'80 Mbps avg',img:'https://images.unsplash.com/photo-1580137189272-c9379f8864fd?w=800&q=80'},
+  {name:'Zagreb',count:62,wifi:'120 Mbps avg',img:'https://images.unsplash.com/photo-1566296438522-7a1b88e4f3b7?w=800&q=80'},
+  {name:'Rovinj',count:31,wifi:'70 Mbps avg',img:'https://images.unsplash.com/photo-1596422846543-75c6fc197f11?w=800&q=80'},
+  {name:'Zadar',count:28,wifi:'90 Mbps avg',img:'https://images.unsplash.com/photo-1555990793-da11153b2473?w=800&q=80'},
+];
+
+const listings = [
+  {id:1,title:'Studio s pogledom na more',loc:'Split, Bačvice',type:'Studio',wifi:150,wifiLabel:'fast',weekPrice:280,monthPrice:950,tags:['Radni stol','Klimatizacija'],img:'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80'},
+  {id:2,title:'Coliving Prostor — Soba 3',loc:'Dubrovnik, Stari grad',type:'Coliving soba',wifi:200,wifiLabel:'fast',weekPrice:320,monthPrice:1100,tags:['Zajednička kuhinja','Terasa'],img:'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80'},
+  {id:3,title:'Moderan apartman u centru',loc:'Zagreb, Gornji grad',type:'Apartman',wifi:85,wifiLabel:'mid',weekPrice:240,monthPrice:780,tags:['Brzi lift','Coworking blizu'],img:'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80'},
+  {id:4,title:'Mirna kuća uz more',loc:'Rovinj, Stari grad',type:'Kuća',wifi:60,wifiLabel:'mid',weekPrice:410,monthPrice:1400,tags:['Vrt','Parking'],img:'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80'},
+  {id:5,title:'Nomad hub — dvokrevetna soba',loc:'Split, Meje',type:'Coliving soba',wifi:300,wifiLabel:'fast',weekPrice:190,monthPrice:680,tags:['Ergonomska stolica','Printer'],img:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=80'},
+  {id:6,title:'Penthouse s terasom',loc:'Zadar, Poluotok',type:'Penthouse',wifi:100,wifiLabel:'fast',weekPrice:550,monthPrice:1900,tags:['Bazen','Pogled na more'],img:'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80'},
+];
+
+// RENDER LOCATIONS
+const locGrid = document.getElementById('locGrid');
+locations.forEach((l,i) => {
+  const card = document.createElement('a');
+  card.href = `smjestaj.html?loc=${l.name.toLowerCase()}`;
+  card.className = 'loc-card' + (l.large ? ' large' : '');
+  card.innerHTML = `
+    <img class="loc-img" src="${l.img}" alt="${l.name}" loading="lazy">
+    <div class="loc-overlay"></div>
+    <div class="loc-info">
+      <div class="loc-name">${l.name}</div>
+      <div class="loc-count">${l.count} oglasa</div>
+      <div class="loc-wifi"><span class="loc-wifi-dot"></span><span class="loc-wifi-text">${l.wifi}</span></div>
+    </div>`;
+  locGrid.appendChild(card);
+});
+
+// RENDER LISTINGS
+const featuredGrid = document.getElementById('featuredGrid');
+listings.forEach(l => {
+  const card = document.createElement('a');
+  card.href = `oglas.html?id=${l.id}`;
+  card.className = 'listing-card';
+  card.innerHTML = `
+    <div class="listing-card-img">
+      <img src="${l.img}" alt="${l.title}" loading="lazy">
+      <div class="listing-badge">
+        <span class="badge-type">${l.type}</span>
+        <span class="badge-wifi ${l.wifiLabel}">⚡ ${l.wifi} Mbps</span>
+      </div>
+    </div>
+    <div class="listing-card-body">
+      <div class="listing-card-loc"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>${l.loc}</div>
+      <div class="listing-card-title">${l.title}</div>
+      <div class="listing-card-tags">${l.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+      <div class="listing-card-price">
+        <span class="price-main">€${l.weekPrice}</span>
+        <span class="price-per">/ tjedan</span>
+        <span class="price-month">€${l.monthPrice} / mj.</span>
+      </div>
+    </div>`;
+  featuredGrid.appendChild(card);
+});
+
+// MOBILE MENU
+document.getElementById('hamBtn').addEventListener('click',()=>{
+  document.getElementById('mobDrawer').classList.add('open');
+});
+document.getElementById('mobClose').addEventListener('click',()=>{
+  document.getElementById('mobDrawer').classList.remove('open');
+});
+</script>
+</body>
+</html>
