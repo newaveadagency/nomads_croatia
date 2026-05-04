@@ -231,34 +231,84 @@ button{cursor:pointer;font-family:'Jost',sans-serif;}
 .mob-btn-solid{background:#fff;color:var(--navy);}
 .mob-btn-ghost{background:none;border:1px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.8);}
 
-@media(max-width:1024px){
+/* Tablet landscape / small desktop: 900–1200px */
+@media(max-width:1100px){
+  .nav{padding:0 28px;}
+  .listings-grid{grid-template-columns:repeat(2,1fr);}
+  .locations-grid{grid-template-columns:repeat(2,1fr);gap:14px;}
+  .loc-card.large{grid-row:auto;}
   .features-grid{grid-template-columns:repeat(2,1fr);}
   .footer-top{grid-template-columns:1fr 1fr;}
+  .wifi-inner{gap:48px;}
 }
-@media(max-width:768px){
+
+/* Tablet portrait: 600–900px */
+@media(max-width:860px){
   .nav{padding:0 20px;}
-  .nav-links,.nav-owner{display:none;}
+  .nav-links{display:none;}
+  .nav-owner{display:none;}
   .nav-cta{display:none;}
   .ham{display:flex;}
-  .hero-content{padding:60px 20px;}
+  .hero-content{padding:64px 24px;}
   .search-box{flex-direction:column;gap:2px;padding:8px;}
   .search-field{border-right:none;border-bottom:1px solid var(--border);padding:12px 14px;}
   .search-field:last-of-type{border-bottom:none;}
-  .stats-bar{padding:16px 20px;}
-  .stats-bar-inner{gap:0;}
-  .stat-item{padding:6px 12px;}
-  .stat-num{font-size:22px;}
-  .sec{padding:56px 20px;}
-  .locations-grid{grid-template-columns:1fr 1fr;gap:12px;}
-  .loc-card.large{grid-row:auto;}
-  .listings-grid{grid-template-columns:1fr;}
-  .features-grid{grid-template-columns:1fr;}
-  .wifi-inner{grid-template-columns:1fr;gap:40px;}
-  .how-steps{grid-template-columns:1fr 1fr;gap:32px;}
+  .stats-bar{padding:14px 20px;}
+  .stats-bar-inner{flex-wrap:wrap;justify-content:center;}
+  .stat-item{flex:0 0 33.33%;border-right:none;padding:8px 12px;}
+  .sec{padding:56px 24px;}
+  .wifi-inner{grid-template-columns:1fr;gap:36px;}
+  .cta-banner{flex-direction:column;padding:40px 32px;}
+  .cta-actions{flex-direction:row;flex-wrap:wrap;}
+  .how-steps{grid-template-columns:1fr 1fr;gap:28px;}
   .how-steps::before{display:none;}
-  .cta-banner{flex-direction:column;padding:40px 28px;}
+  .footer-top{grid-template-columns:1fr 1fr;}
+}
+
+/* Mobile: ≤ 480px — pokriva S24 (360px) i iPhone (390px) */
+@media(max-width:480px){
+  .nav{padding:0 16px;height:60px;}
+  .nav-logo-text{font-size:18px;}
+  .nav-logo-sub{display:none;}
+  .hero-content{padding:48px 16px 40px;}
+  .hero-title{font-size:36px;}
+  .hero-sub{font-size:15px;}
+  .search-box{border-radius:14px;padding:6px;}
+  .search-field{padding:10px 12px;}
+  .search-field-val,.search-field input,#durSelect{font-size:14px;}
+  .search-tags{gap:8px;margin-top:16px;}
+  .search-tag{font-size:10px;padding:6px 12px;}
+  .stats-bar{padding:12px 16px;}
+  .stats-bar-inner{justify-content:center;}
+  .stat-item{flex:0 0 33.33%;padding:6px 4px;}
+  .stat-num{font-size:20px;}
+  .stat-lbl{font-size:9px;}
+  .sec{padding:44px 16px;}
+  .sec-title{font-size:30px;}
+  .locations-grid{grid-template-columns:1fr 1fr;gap:8px;}
+  .loc-card.large{grid-row:auto;}
+  .loc-name{font-size:18px;}
+  .listings-grid{grid-template-columns:1fr;gap:16px;}
+  .listing-card-title{font-size:18px;}
+  .features-grid{grid-template-columns:1fr;gap:12px;}
+  .wifi-inner{grid-template-columns:1fr;gap:32px;padding:0 16px;}
+  .wifi-section{padding:56px 16px;}
+  .wifi-tier{padding:12px 14px;gap:12px;}
+  .wifi-tier-badge{width:40px;height:40px;}
+  .how-steps{grid-template-columns:1fr 1fr;gap:20px;}
+  .how-steps::before{display:none;}
+  .how-num{width:44px;height:44px;font-size:18px;}
+  .cta-banner{padding:28px 20px;border-radius:16px;}
+  .cta-text .sec-title{font-size:26px;}
   .cta-actions{flex-direction:column;width:100%;}
-  .footer-top{grid-template-columns:1fr;gap:32px;}
+  .cta-actions .btn{width:100%;justify-content:center;}
+  .footer{padding:44px 16px 24px;}
+  .footer-top{grid-template-columns:1fr;gap:28px;}
+  .footer-bottom{flex-direction:column;gap:12px;text-align:center;}
+  .footer-legal{justify-content:center;}
+  .sec-header{flex-direction:column !important;align-items:flex-start !important;gap:16px;}
+  .mob-drawer{padding:72px 28px 36px;}
+  .mob-link{font-size:26px;}
 }
 </style>
 </head>
